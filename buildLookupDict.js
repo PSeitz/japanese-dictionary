@@ -79,8 +79,15 @@ console.timeEnd('Build Dictionary');
 
 var db = new sqlite3.Database('lookup.db');
 db.serialize(function() {
+
+    // INSERT INTO “android_metadata” VALUES (‘en_US’)
+
+    db.run("DROP TABLE IF EXISTS android_metadata");
+    db.run("CREATE TABLE \"android_metadata\" (\"locale\" TEXT DEFAULT 'en_US')");
+    db.run("INSERT INTO \"android_metadata\" VALUES ('en_US')");
+
     db.run("DROP TABLE IF EXISTS lookup");
-    db.run("CREATE TABLE lookup (entryname TEXT PRIMARY KEY, occurences TEXT)");
+    db.run("CREATE TABLE lookup (_id TEXT PRIMARY KEY, occurences TEXT)");
 
     db.run("BEGIN TRANSACTION");
     console.time('Db inserts');
@@ -94,12 +101,6 @@ db.serialize(function() {
 
     console.timeEnd('Db inserts');
 
-    
-    // db.each("SELECT entryname, occurences FROM lookup", function(err, row) {
-    //   if (row) console.log(row);
-    //   // console.log("row");
-    //     // console.log(row.id + ": " + row.info);
-    // });
 });
 
 db.close();
@@ -109,7 +110,10 @@ db.close();
 // Pretty Print
 fs.writeFileSync("lookupdict.json", JSON.stringify(allLanguages, null, 4), 'utf8');
 fs.writeFileSync("japanese_lookupdict.json", JSON.stringify(japanese, null, 4), 'utf8');
-fs.writeFileSync("all_lookupdict.json", JSON.stringify(japanese, null, 4), 'utf8');
+fs.writeFileSync("all_lookupdict.json", JSON.stringify(all, null, 4), 'utf8');
+
 // fs.writeFileSync("lookupdict.json", JSON.stringify(allLanguages), 'utf8');
 // fs.writeFileSync("japanese_lookupdict.json", JSON.stringify(japanese), 'utf8');
+// fs.writeFileSync("all_lookupdict.json", JSON.stringify(all), 'utf8');
+
 
