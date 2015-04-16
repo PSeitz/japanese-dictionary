@@ -1,0 +1,12 @@
+Commonness: 
+    "ichi1": 15
+    "ichi2": 5
+    "news1": 10
+    "news2": 5
+    "spec1": 15
+    "spec2": 5
+    "gai1" : 10
+    "gai2" : 5
+allLanguages : ["ger", "eng", "hun", "spa", "slv", "fre", "dut"]
+SelectedLanguages: ["ger", "eng"]
+PositionalArguments: True
