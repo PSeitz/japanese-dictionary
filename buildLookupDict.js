@@ -13,11 +13,12 @@ var xmlDoc = libxmljs.parseXml(jmdict);
 console.timeEnd('parse xml');
 
 var allLanguages = ["ger", "eng", "hun", "spa", "slv", "fre", "dut"];
-var selectedLanguages = ["ger", "eng"];
+var selectedLanguages = ["all"];
 
 var allLanguages = {}; // name : [occurences]
 var japanese = {}; // name : [occurences]
 var all = {}; // name : [occurences]
+
 // all entries
 var entries = xmlDoc.find('//entry');
 
@@ -51,7 +52,7 @@ function addWord(word, dict, occurence){
 console.time('Build Dictionary');
 for (var entryPos = 0; entryPos < entries.length; entryPos++) {
     var entry = entries[entryPos];
-
+    var ent_seq = entry.get('ent_seq').text();
     var trans_words = entry.find('sense//gloss');
     var kanjis = entry.find('k_ele//keb'); //kanjis
     var kanas = entry.find('r_ele//reb'); //kanas
@@ -59,19 +60,19 @@ for (var entryPos = 0; entryPos < entries.length; entryPos++) {
         var attr = trans_words[k].attr("lang");
         if (selectedLanguages == "all" || (!attr || selectedLanguages.indexOf(attr.value()) >= 0)  ) {
             var word = trans_words[k].text();
-            addWord(word, allLanguages, entryPos);
+            addWord(word, allLanguages, ent_seq);
         }
     }
 
     for (k = 0; k < kanjis.length; k++) {
-        addWord(kanjis[k].text(), japanese, entryPos);
+        addWord(kanjis[k].text(), japanese, ent_seq);
     }
 
     for (k = 0; k < kanas.length; k++) {
         var kana = kanas[k].text();
         var romaji = toTitleCase(hepburn.fromKana(kana));
-        addWord(kana, japanese, entryPos);
-        addWord(romaji, japanese, entryPos);
+        addWord(kana, japanese, ent_seq);
+        addWord(romaji, japanese, ent_seq);
     }
 
 }
@@ -87,13 +88,21 @@ db.serialize(function() {
     db.run("INSERT INTO \"android_metadata\" VALUES ('en_US')");
 
     db.run("DROP TABLE IF EXISTS lookup");
-    db.run("CREATE TABLE lookup (_id TEXT PRIMARY KEY, occurences TEXT)");
+    db.run("CREATE TABLE lookup (_id INTEGER PRIMARY KEY, text TEXT, ent_seq INTEGER)");
 
     db.run("BEGIN TRANSACTION");
     console.time('Db inserts');
-    var stmt = db.prepare("INSERT INTO lookup VALUES (?, ?)");
+    var stmt = db.prepare("INSERT INTO lookup VALUES (?, ?, ?)");
+    var id = 0;
     for (var prop in all) {
-        stmt.run(prop, all[prop].join(";") );
+
+        for (var i = 0; i < all[prop].length; i++) {
+            var ent_seq = all[prop][i];
+            stmt.run(id,prop, ent_seq);
+            id++;
+        }
+
+        // stmt.run(prop, all[prop].join(";") );
         // stmt.run("lub");
     }
     stmt.finalize();
