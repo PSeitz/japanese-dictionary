@@ -77,7 +77,7 @@ for (var entryPos = 0; entryPos < entries.length; entryPos++) {
 }
 console.timeEnd('Build Dictionary');
 
-var db = new sqlite3.Database('lookup.db');
+var db = new sqlite3.Database('lookup.sqlite');
 db.serialize(function() {
 
     // INSERT INTO “android_metadata” VALUES (‘en_US’)
@@ -93,7 +93,7 @@ db.serialize(function() {
     console.time('Db inserts');
     var stmt = db.prepare("INSERT INTO lookup VALUES (?, ?)");
     for (var prop in all) {
-        stmt.run(prop, "");
+        stmt.run(prop, all[prop].join(";") );
         // stmt.run("lub");
     }
     stmt.finalize();
@@ -108,9 +108,9 @@ db.close();
 
 
 // Pretty Print
-fs.writeFileSync("lookupdict.json", JSON.stringify(allLanguages, null, 4), 'utf8');
-fs.writeFileSync("japanese_lookupdict.json", JSON.stringify(japanese, null, 4), 'utf8');
-fs.writeFileSync("all_lookupdict.json", JSON.stringify(all, null, 4), 'utf8');
+// fs.writeFileSync("lookupdict.json", JSON.stringify(allLanguages, null, 4), 'utf8');
+// fs.writeFileSync("japanese_lookupdict.json", JSON.stringify(japanese, null, 4), 'utf8');
+// fs.writeFileSync("all_lookupdict.json", JSON.stringify(all, null, 4), 'utf8');
 
 // fs.writeFileSync("lookupdict.json", JSON.stringify(allLanguages), 'utf8');
 // fs.writeFileSync("japanese_lookupdict.json", JSON.stringify(japanese), 'utf8');

@@ -1,6 +1,5 @@
 var fs = require('fs');
 var libxmljs = require("libxmljs");
-var _ = require('lodash');
 var yaml = require('js-yaml');
 var _ = require('lodash');
 var hepburn = require("hepburn");
@@ -216,8 +215,13 @@ var json_entries = buildDictionary();
 
 console.timeEnd('Build Dictionary');
 
-
 // Pretty Print
 fs.writeFileSync("jmdict.json", JSON.stringify(json_entries, null, 2), 'utf8');
-
 // fs.writeFileSync("jmdict.json", JSON.stringify(json_entries), 'utf8');
+
+
+module.exports = json_entries;
+
+
+
+
