@@ -2,6 +2,7 @@ var fs = require('fs');
 var libxmljs = require("libxmljs");
 var hepburn = require("hepburn");
 var sqlite3 = require('sqlite3');
+var yaml = require('js-yaml');
 
 console.time('readFile');
 var jmdict = fs.readFileSync("JMdict");
@@ -12,10 +13,18 @@ console.time('parse xml');
 var xmlDoc = libxmljs.parseXml(jmdict);
 console.timeEnd('parse xml');
 
-var allLanguages = ["ger", "eng", "hun", "spa", "slv", "fre", "dut"];
-var selectedLanguages = ["all"];
+// var allLanguages = ["ger", "eng", "hun", "spa", "slv", "fre", "dut"];
+// var selectedLanguages = ["all"];
 
-var allLanguages = {}; // name : [occurences]
+var config;
+try {
+    config = yaml.safeLoad(fs.readFileSync('convert.yml', 'utf8'));
+} catch (e) {
+    console.log(e);
+}
+var selectedLanguages = config.SelectedLanguages;// ["ger", "eng"];
+
+var otherLanguages = {}; // name : [occurences]
 var japanese = {}; // name : [occurences]
 var all = {}; // name : [occurences]
 
@@ -60,7 +69,7 @@ for (var entryPos = 0; entryPos < entries.length; entryPos++) {
         var attr = trans_words[k].attr("lang");
         if (selectedLanguages == "all" || (!attr || selectedLanguages.indexOf(attr.value()) >= 0)  ) {
             var word = trans_words[k].text();
-            addWord(word, allLanguages, ent_seq);
+            addWord(word, otherLanguages, ent_seq);
         }
     }
 
@@ -117,11 +126,11 @@ db.close();
 
 
 // Pretty Print
-// fs.writeFileSync("lookupdict.json", JSON.stringify(allLanguages, null, 4), 'utf8');
+// fs.writeFileSync("lookupdict.json", JSON.stringify(otherLanguages, null, 4), 'utf8');
 // fs.writeFileSync("japanese_lookupdict.json", JSON.stringify(japanese, null, 4), 'utf8');
 // fs.writeFileSync("all_lookupdict.json", JSON.stringify(all, null, 4), 'utf8');
 
-// fs.writeFileSync("lookupdict.json", JSON.stringify(allLanguages), 'utf8');
+// fs.writeFileSync("lookupdict.json", JSON.stringify(otherLanguages), 'utf8');
 // fs.writeFileSync("japanese_lookupdict.json", JSON.stringify(japanese), 'utf8');
 // fs.writeFileSync("all_lookupdict.json", JSON.stringify(all), 'utf8');
 

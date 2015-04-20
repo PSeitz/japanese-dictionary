@@ -35,7 +35,7 @@ console.time('parse xml');
 var xmlDoc = libxmljs.parseXml(jmdict);
 console.timeEnd('parse xml');
 
-var allVocabs = [];
+// var allVocabs = [];
 // all entries
 var entries = xmlDoc.find('//entry');
 
@@ -75,6 +75,10 @@ function toTitleCase(str)
     return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
+function convertToRomaji(str)
+{
+    return toTitleCase(hepburn.fromKana(str));
+}
 
 function getKanjiKana(xml_entry, selector, textSelector, commonnessSelector, addRomaji){
     var gatherEntryInfo = [];
@@ -87,7 +91,7 @@ function getKanjiKana(xml_entry, selector, textSelector, commonnessSelector, add
             commonness : calculateCommonness(kanji_xml, commonnessSelector)
         };
         if (addRomaji) {
-            kanji_kana.romaji = toTitleCase(hepburn.fromKana(kanji_kana_text));
+            kanji_kana.romaji = convertToRomaji(kanji_kana_text);
         }
         gatherEntryInfo.push(kanji_kana);
     }
@@ -108,7 +112,7 @@ function getMeanings(xml_entry){
 
     // function get 
     function positionalArguments (sense_xml, onlyIndex) {
-        return _.map(sense_xml.find("pos"), function(value, index, collection){
+        return _.map(sense_xml.find("pos"), function(value){
             if (onlyIndex) {
                 return entities_metadata.getEntityIndexWithLong(value.text());
             }else{
@@ -166,12 +170,13 @@ function buildKanaMap(){
             if (_.contains(selectedLanguages, attr ? attr.value() : "eng") || selectedLanguages == "all") {
 
                 var word = kanas[k].text();
-                word = word.replace(/ *\([^)]*\) */g, " ");
-                word = word.trim();
-                word = word.toLowerCase();
+                // word = word.replace(/ *\([^)]*\) */g, " ");
+                // word = word.trim();
+                // word = word.toLowerCase();
 
                 // kanaMap[word] = true;
-                service.kana_array.push({text: word, ent_seq: ent_seq});
+                service.kana_array.push({text: word, ent_seq: ent_seq, romaji: convertToRomaji(word) });
+
             }
         }
     }
@@ -216,13 +221,18 @@ function getAllMeanings(){
             var lang = gloss_xml.attr("lang");
             lang = lang ? lang.value() : "eng";
 
+            if (_.contains(selectedLanguages, lang) || selectedLanguages == "all") {
+                // meanings.push(meaning);
+                allLanguages[lang] = true;
+                service.meaning_array.push({text: gloss_xml.text(), lang:lang, ent_seq: ent_seq});
+            }
+
             // var meaningid = gloss_xml.text()+lang;
             // meanings[meaningid] = {
             //     text:gloss_xml.text(),
             //     lang:lang
             // };
-            allLanguages[lang] = true;
-            service.meaning_array.push({text: gloss_xml.text(), lang:lang, ent_seq: ent_seq});
+
         }
     }
 
@@ -269,7 +279,7 @@ function buildDictionary(){
     var entries = xmlDoc.find('//entry');
     for (var i = 0; i < entries.length; i++) {
         var xml_entry = entries[i];
-        var ent_seq = xml_entry.get('ent_seq').text();
+        // var ent_seq = xml_entry.get('ent_seq').text();
         var entry = {
             kanji:[], // {text: blub, commonness: 10} 
             kana:[], // {text: blub, commonness: 10, romaji: }    
