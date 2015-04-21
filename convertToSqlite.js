@@ -50,6 +50,9 @@ db.serialize(function() {
         }
     });
 
+    db.run("CREATE INDEX kana_index ON kanas(kana)");
+    db.run("CREATE INDEX kanji_index ON kanjis(kanji)");
+
     console.timeEnd('Db inserts');
 
 });
