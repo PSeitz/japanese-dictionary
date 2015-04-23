@@ -21,18 +21,19 @@ db.serialize(function() {
     db.run("DROP TABLE IF EXISTS meanings");
     db.run("DROP TABLE IF EXISTS languages");
 
-    db.run("CREATE TABLE kanjis (_id INTEGER PRIMARY KEY, kanji TEXT NOT NULL, ent_seq INTEGER)");
-    db.run("CREATE TABLE kanas (_id INTEGER PRIMARY KEY, kana TEXT NOT NULL, ent_seq INTEGER, romaji TEXT NOT NULL)");
     db.run("CREATE TABLE languages (_id INTEGER PRIMARY KEY, lang TEXT NOT NULL UNIQUE)");
+
+    db.run("CREATE TABLE kanjis (_id INTEGER PRIMARY KEY, kanji TEXT NOT NULL, ent_seq INTEGER, commonness INTEGER)");
+    db.run("CREATE TABLE kanas (_id INTEGER PRIMARY KEY, kana TEXT NOT NULL, ent_seq INTEGER, romaji TEXT NOT NULL, commonness INTEGER)");
     db.run("CREATE TABLE meanings (_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )");
     // db.run("CREATE TABLE entries (_id INTEGER PRIMARY KEY, ent_seq INTEGER, meaning lang, kanji  FOREIGN KEY(trackartist) REFERENCES artist(artistid))");
 
     console.time('Db inserts');
 
     console.log("kanjis");
-    insert({ table: "kanjis", data: data.getAllKanji(), properties: ["text", "ent_seq"]});
+    insert({ table: "kanjis", data: data.getAllKanji(), properties: ["text", "ent_seq", "commonness"]});
     console.log("kanas");
-    insert({ table: "kanas", data: data.getAllKana(), properties: ["text", "ent_seq", "romaji"] });
+    insert({ table: "kanas", data: data.getAllKana(), properties: ["text", "ent_seq", "romaji", "commonness"] });
     console.log("languages");
 
     insert({ table: "languages", data: data.getAllLanguages()});

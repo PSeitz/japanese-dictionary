@@ -8,5 +8,5 @@ Commonness:
     "gai1" : 10
     "gai2" : 5
 allLanguages : ["ger", "eng", "hun", "spa", "slv", "fre", "dut"]
-SelectedLanguages: ["all"]
+SelectedLanguages: ["ger", "eng"]
 PositionalArguments: True
