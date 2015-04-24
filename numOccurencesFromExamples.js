@@ -25,7 +25,7 @@ for (var i = 0; i < examples.length; i++) {
     examples[i] = examples[i].replace(/ *\{[^}]*\} */g, " "); // remove { }
     examples[i] = examples[i].replace(/ *\[[^\]]*\] */g, " ");// remove [ ]
     examples[i] = examples[i].trim();
-    examples[i] = examples[i].replace(/\s{2,}/g, ' ');
+    examples[i] = examples[i].replace(/\s{2,}/g, ' ');// convert all spaces to single spaces
     examples[i] = examples[i].split(" ");
 
     for (var j = 0; j < examples[i].length; j++) {
