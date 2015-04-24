@@ -56,7 +56,7 @@ db.serialize(function() {
 
     db.run("CREATE INDEX kana_ent_seqs ON kanas(ent_seq)");
     db.run("CREATE INDEX kanji_ent_seqs ON kanjis(ent_seq)");
-    db.run("CREATE INDEX meaning_ent_seqs ON meanings(meaning)");
+    db.run("CREATE INDEX meaning_ent_seqs ON meanings(ent_seq)");
 
     console.timeEnd('Db inserts');
 
