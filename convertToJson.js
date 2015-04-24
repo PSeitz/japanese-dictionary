@@ -28,6 +28,8 @@ console.log(selectedLanguages);
 // });
 // console.log(position_of_speech[0]);
 
+var numOccurences = require("./numOccurencesFromExamples");
+var occurenceMap = numOccurences.getMap();
 
 var entities_metadata = require("./entities_metadata");
 
@@ -176,12 +178,14 @@ function buildKanaMap(){
                 if (_.contains(selectedLanguages, attr ? attr.value() : "eng") || selectedLanguages == "all") {
 
                     var word = kanas[k].text();
+                    // var num_occurences = 0;
+                    // if(occurenceMap[word]) num_occurences = occurenceMap[word];
                     // word = word.replace(/ *\([^)]*\) */g, " ");
                     // word = word.trim();
                     // word = word.toLowerCase();
                     
                     // kanaMap[word] = true;
-                    service.kana_array.push({text: word, ent_seq: ent_seq, romaji: convertToRomaji(word), commonness:commonness });
+                    service.kana_array.push({text: word, ent_seq: ent_seq, romaji: convertToRomaji(word), commonness:commonness, num_occurences:occurenceMap[word] || 0 });
 
                 }
             }
@@ -208,7 +212,7 @@ function buildKanjiMap(){
             for (var k = 0; k < kanjis.length; k++) {
                 var word = kanjis[k].text();
                 // kanjiMap[word] = {text: kanjiMap[word], ent_seq: ent_seq};
-                service.kanj_array.push({text: word, ent_seq: ent_seq, commonness:commonness});
+                service.kanj_array.push({text: word, ent_seq: ent_seq, commonness:commonness, num_occurences:occurenceMap[word] || 0});
             }
         }
     }

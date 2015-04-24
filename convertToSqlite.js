@@ -23,17 +23,17 @@ db.serialize(function() {
 
     db.run("CREATE TABLE languages (_id INTEGER PRIMARY KEY, lang TEXT NOT NULL UNIQUE)");
 
-    db.run("CREATE TABLE kanjis (_id INTEGER PRIMARY KEY, kanji TEXT NOT NULL, ent_seq INTEGER, commonness INTEGER)");
-    db.run("CREATE TABLE kanas (_id INTEGER PRIMARY KEY, kana TEXT NOT NULL, ent_seq INTEGER, romaji TEXT NOT NULL, commonness INTEGER)");
+    db.run("CREATE TABLE kanjis (_id INTEGER PRIMARY KEY, kanji TEXT NOT NULL, ent_seq INTEGER, commonness INTEGER, num_occurences INTEGER)");
+    db.run("CREATE TABLE kanas (_id INTEGER PRIMARY KEY, kana TEXT NOT NULL, ent_seq INTEGER, romaji TEXT NOT NULL, commonness INTEGER, num_occurences INTEGER)");
     db.run("CREATE TABLE meanings (_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )");
     // db.run("CREATE TABLE entries (_id INTEGER PRIMARY KEY, ent_seq INTEGER, meaning lang, kanji  FOREIGN KEY(trackartist) REFERENCES artist(artistid))");
 
     console.time('Db inserts');
 
     console.log("kanjis");
-    insert({ table: "kanjis", data: data.getAllKanji(), properties: ["text", "ent_seq", "commonness"]});
+    insert({ table: "kanjis", data: data.getAllKanji(), properties: ["text", "ent_seq", "commonness", "num_occurences"]});
     console.log("kanas");
-    insert({ table: "kanas", data: data.getAllKana(), properties: ["text", "ent_seq", "romaji", "commonness"] });
+    insert({ table: "kanas", data: data.getAllKana(), properties: ["text", "ent_seq", "romaji", "commonness", "num_occurences"] });
     console.log("languages");
 
     insert({ table: "languages", data: data.getAllLanguages()});
@@ -53,6 +53,10 @@ db.serialize(function() {
 
     db.run("CREATE INDEX kana_index ON kanas(kana)");
     db.run("CREATE INDEX kanji_index ON kanjis(kanji)");
+
+    db.run("CREATE INDEX kana_ent_seqs ON kanas(ent_seq)");
+    db.run("CREATE INDEX kanji_ent_seqs ON kanjis(ent_seq)");
+    db.run("CREATE INDEX meaning_ent_seqs ON meanings(meaning)");
 
     console.timeEnd('Db inserts');
 
