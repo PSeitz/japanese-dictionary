@@ -31,14 +31,14 @@ db.serialize(function() {
     console.time('Db inserts');
 
     console.log("kanjis");
-    insert({ table: "kanjis", data: data.getAllKanji(), properties: ["text", "ent_seq", "commonness", "num_occurences"]});
+    insert(db, { table: "kanjis", data: data.getAllKanji(), properties: ["text", "ent_seq", "commonness", "num_occurences"]});
     console.log("kanas");
-    insert({ table: "kanas", data: data.getAllKana(), properties: ["text", "ent_seq", "romaji", "commonness", "num_occurences"] });
+    insert(db, { table: "kanas", data: data.getAllKana(), properties: ["text", "ent_seq", "romaji", "commonness", "num_occurences"] });
     console.log("languages");
 
-    insert({ table: "languages", data: data.getAllLanguages()});
+    insert(db, { table: "languages", data: data.getAllLanguages()});
     console.log("meanings");
-    insert({
+    insert(db, {
         table: "meanings",
         data: data.getAllMeanings(),
         properties: ["text", "lang", "ent_seq"],
@@ -63,7 +63,49 @@ db.serialize(function() {
 });
 
 
-function insert(options){
+// db = new sqlite3.Database('meanings.sqlite');
+// db.serialize(function() {
+
+//     // INSERT INTO “android_metadata” VALUES (‘en_US’)
+
+//     db.run("DROP TABLE IF EXISTS android_metadata");
+//     db.run("CREATE TABLE \"android_metadata\" (\"locale\" TEXT DEFAULT 'en_US')");
+//     db.run("INSERT INTO \"android_metadata\" VALUES ('en_US')");
+
+//     db.run("DROP TABLE IF EXISTS meanings");
+//     db.run("DROP TABLE IF EXISTS languages");
+
+//     db.run("CREATE TABLE languages (_id INTEGER PRIMARY KEY, lang TEXT NOT NULL UNIQUE)");
+//     db.run("CREATE TABLE meanings (_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )");
+//     // db.run("CREATE TABLE entries (_id INTEGER PRIMARY KEY, ent_seq INTEGER, meaning lang, kanji  FOREIGN KEY(trackartist) REFERENCES artist(artistid))");
+
+//     console.time('Db inserts');
+
+//     console.log("languages");
+//     insert(db, { table: "languages", data: data.getAllLanguages()});
+//     console.log("meanings");
+//     insert(db, {
+//         table: "meanings",
+//         data: data.getAllMeanings(),
+//         properties: ["text", "lang", "ent_seq"],
+//         fk: {
+//             "lang": {
+//                 table: "languages",
+//                 field: "_id",
+//                 value: "lang"
+//             }
+//         }
+//     });
+
+//     db.run("CREATE INDEX meaning_ent_seqs ON meanings(ent_seq)");
+
+//     console.timeEnd('Db inserts');
+
+// });
+
+
+
+function insert(db, options){
     var data = options.data;
 
     db.run("BEGIN TRANSACTION");
