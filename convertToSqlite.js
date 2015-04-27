@@ -23,24 +23,26 @@ db.serialize(function() {
 
     db.run("CREATE TABLE languages (_id INTEGER PRIMARY KEY, lang TEXT NOT NULL UNIQUE)");
 
-    db.run("CREATE TABLE kanjis (_id INTEGER PRIMARY KEY, kanji TEXT NOT NULL, ent_seq INTEGER, commonness INTEGER, num_occurences INTEGER)");
-    db.run("CREATE TABLE kanas (_id INTEGER PRIMARY KEY, kana TEXT NOT NULL, ent_seq INTEGER, romaji TEXT NOT NULL, commonness INTEGER, num_occurences INTEGER)");
-    db.run("CREATE TABLE meanings (_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )");
+    db.run("CREATE TABLE kanjis (_id INTEGER PRIMARY KEY, kanji TEXT NOT NULL, ent_seq INTEGER, num_occurences INTEGER)");
+    db.run("CREATE TABLE kanas (_id INTEGER PRIMARY KEY, kana TEXT NOT NULL, ent_seq INTEGER, romaji TEXT NOT NULL, num_occurences INTEGER)");
+    // db.run("CREATE VIRTUAL TABLE meanings USING fts3(_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )");
     // db.run("CREATE TABLE entries (_id INTEGER PRIMARY KEY, ent_seq INTEGER, meaning lang, kanji  FOREIGN KEY(trackartist) REFERENCES artist(artistid))");
+    db.run("CREATE TABLE meanings (_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )");
 
     console.time('Db inserts');
 
     console.log("kanjis");
-    insert(db, { table: "kanjis", data: data.getAllKanji(), properties: ["text", "ent_seq", "commonness", "num_occurences"]});
+    insert(db, { table: "kanjis", data: data.getAllKanji(), properties: ["text", "ent_seq", "num_occurences"]});
     console.log("kanas");
-    insert(db, { table: "kanas", data: data.getAllKana(), properties: ["text", "ent_seq", "romaji", "commonness", "num_occurences"] });
+    insert(db, { table: "kanas", data: data.getAllKana(), properties: ["text", "ent_seq", "romaji", "num_occurences"] });
     console.log("languages");
 
     insert(db, { table: "languages", data: data.getAllLanguages()});
     console.log("meanings");
     insert(db, {
         table: "meanings",
-        data: data.getAllMeanings(),
+        tablefields: ["_id", "meaning", "lang", "ent_seq"],
+        data: data.getAllMeanings({removeParentheses: true}),
         properties: ["text", "lang", "ent_seq"],
         fk: {
             "lang": {
@@ -53,6 +55,7 @@ db.serialize(function() {
 
     db.run("CREATE INDEX kana_index ON kanas(kana)");
     db.run("CREATE INDEX kanji_index ON kanjis(kanji)");
+    db.run("CREATE INDEX meaning_index ON meanings(meaning)");
 
     db.run("CREATE INDEX kana_ent_seqs ON kanas(ent_seq)");
     db.run("CREATE INDEX kanji_ent_seqs ON kanjis(ent_seq)");
@@ -140,7 +143,12 @@ function insert(db, options){
             argumentos.push(entry);
         }
         
-        db.run("INSERT INTO "+options.table+" VALUES ("+databinding.join(",")+")", argumentos);
+
+        // (_id, meaning, lang, ent_seq )
+        var query;
+        if (options.tablefields) query = "INSERT INTO "+options.table + "("+options.tablefields.join(",")+")" +" VALUES ("+databinding.join(",")+")";
+        else query = "INSERT INTO "+options.table +" VALUES ("+databinding.join(",")+")";
+        db.run(query, argumentos);
 
         // stmt.run.apply(stmt, argumentos);
     }

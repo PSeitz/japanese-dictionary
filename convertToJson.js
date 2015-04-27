@@ -108,7 +108,7 @@ function containsString(string, array){
 }
 
 
-function getMeanings(xml_entry){
+function getMeanings(xml_entry, options){
     var meanings = [];
     var senses_xml = xml_entry.find("sense");
 
@@ -148,7 +148,10 @@ function getMeanings(xml_entry){
                 meaning.type = getType(pos);
             }
 
-            if (_.contains(selectedLanguages, meaning.lang) || selectedLanguages == "all") {
+            if (options && options.removeParentheses)
+                meaning.text = meaning.text.replace(/ *\([^)]*\) */g, " ");
+
+            if ( (_.contains(selectedLanguages, meaning.lang) || selectedLanguages == "all") && meaning.text!== "") {
                 meanings.push(meaning);
             }
             
@@ -221,11 +224,11 @@ function buildKanjiMap(){
     return service.kanj_array;
 }
 
-function getAllMeanings(){
+function getAllMeanings(options){
     console.time('getMeanings');
     var allLanguages = {};
 
-    if (service.meaning_array) return service.meaning_array;
+    // if (service.meaning_array) return service.meaning_array;
 
     service.meaning_array = [];
     var entries = xmlDoc.find('//entry');
@@ -239,10 +242,15 @@ function getAllMeanings(){
             var lang = gloss_xml.attr("lang");
             lang = lang ? lang.value() : "eng";
 
+            var text = gloss_xml.text();
+
+            if (options && options.removeParentheses)
+                text = text.replace(/ *\([^)]*\) */g, " ").trim();
+
             if (_.contains(selectedLanguages, lang) || selectedLanguages == "all") {
                 // meanings.push(meaning);
                 allLanguages[lang] = true;
-                service.meaning_array.push({text: gloss_xml.text(), lang:lang, ent_seq: ent_seq});
+                service.meaning_array.push({text: text, lang:lang, ent_seq: ent_seq});
             }
 
             // var meaningid = gloss_xml.text()+lang;
