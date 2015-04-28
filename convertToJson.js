@@ -278,6 +278,9 @@ function getAllLanguages () {
 // getAllKana();
 // getAllMeanings();
 
+function getText (elem) {
+    return elem.text();
+}
 
 
 function buildDictionary(){
@@ -304,7 +307,7 @@ function buildDictionary(){
         var j,k, commonness, word, num_occurences;
 
         var miscs = xml_entry.find('misc');
-        entry.misc = _.map(miscs, function(elem){ return elem.text(); });
+        entry.misc = _.map(miscs, getText);
         // Kanji
         var kanji_block = xml_entry.find('k_ele');
         for (j = 0; j < kanji_block.length; j++) {
@@ -314,7 +317,8 @@ function buildDictionary(){
                 word = kanjis[k].text();
                 num_occurences = occurenceMap[word] + commonness;
                 // kanjiMap[word] = {text: kanjiMap[word], ent_seq: ent_seq};
-                entry.kanji.push({text: word, ent_seq: ent_seq, commonness:commonness, num_occurences:num_occurences});
+                var kanji = {text: word, ent_seq: ent_seq, commonness:commonness, num_occurences:num_occurences};
+                entry.kanji.push(kanji);
             }
         }
 
@@ -329,7 +333,8 @@ function buildDictionary(){
                 if (kanji_block.length === 0 && j === 0) {
                     num_occurences = occurenceMap[word] + commonness;
                 }
-                entry.kana.push({text: word, ent_seq: ent_seq, romaji: convertToRomaji(word), commonness:commonness, num_occurences:num_occurences});
+                var kana = {text: word, ent_seq: ent_seq, romaji: convertToRomaji(word), commonness:commonness, num_occurences:num_occurences};
+                entry.kana.push(kana);
             }
         }
 
@@ -346,7 +351,8 @@ function buildDictionary(){
 
             if (_.contains(selectedLanguages, lang || "eng") || selectedLanguages == "all") {
                 allLanguages[lang] = true;
-                entry.meanings.push({text: text, lang:lang, ent_seq: ent_seq});
+                var meaning = {text: text, lang:lang, ent_seq: ent_seq};
+                entry.meanings.push(meaning);
             }
 
         }
