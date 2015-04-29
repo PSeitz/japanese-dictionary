@@ -14,8 +14,8 @@ try {
 var service = {};
 
 console.time('readFile');
-var jmdict = fs.readFileSync("JMdict");
-// var jmdict = fs.readFileSync("example.xml");
+// var jmdict = fs.readFileSync("JMdict");
+var jmdict = fs.readFileSync("example.xml");
 console.timeEnd('readFile');
 
 // var allLanguages = ["ger", "eng", "hun", "spa", "slv", "fre", "dut"];
@@ -39,7 +39,7 @@ console.timeEnd('parse xml');
 
 // var allVocabs = [];
 // all entries
-var entries = xmlDoc.find('//entry');
+// var entries = xmlDoc.find('//entry');
 
 // Calc commonness for kanji and kana
 function calculateCommonness(node, commonnessSelector){
@@ -306,8 +306,7 @@ function buildDictionary(){
         // entry.meanings = getMeanings(xml_entry);
         var j,k, commonness, word, num_occurences;
 
-        var miscs = xml_entry.find('misc');
-        entry.misc = _.map(miscs, getText);
+        
         // Kanji
         var kanji_block = xml_entry.find('k_ele');
         for (j = 0; j < kanji_block.length; j++) {
@@ -356,13 +355,29 @@ function buildDictionary(){
             }
 
         }
+
+        // Merge misc into entry
+        var senses = xml_entry.find('sense');
+        if (senses.length >= 1) {
+            entry.misc = _.map(senses[0].find('misc'), function(elem){ return elem.text(); });
+            if (senses.length > 1) {
+                for (var l = 1; l < senses.length; l++) {
+                    var miscs =  _.map(senses[l].find('misc'), function(elem){ return elem.text(); });
+                    entry.misc = _.intersection(entry.misc, miscs);
+                }
+            }
+
+        }
+
+        if (_.contains(entry.misc, "word usually written using kana alone")) entry.useKana = true;
+
         json_entries.push(entry);
 
     }
 
     console.log(json_entries.length);
     json_entries = _.filter(json_entries, function(entry) {
-        return _.contains(entry.misc, "archaism");
+        return !_.contains(entry.misc, "archaism"); // "word usually written using kana alone"
     });
     console.log(json_entries.length);
     console.timeEnd('Build Dictionary');

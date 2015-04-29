@@ -613,6 +613,7 @@ various information fields.
 <pos>&adj-no;</pos>
 <pos>&adv;</pos>
 <misc>&on-mim;</misc>
+<misc>&arch;</misc>
 <gloss>fresh</gloss>
 <gloss>new</gloss>
 <gloss xml:lang="ger">(1) (2) </gloss>
@@ -632,5 +633,104 @@ various information fields.
 </sense>
 </entry>
 
+<entry>
+<ent_seq>1012730</ent_seq>
+<k_ele>
+<keb>軈て</keb>
+<ke_pri>ichi1</ke_pri>
+</k_ele>
+<k_ele>
+<keb>頓て</keb>
+</k_ele>
+<k_ele>
+<keb>漸て</keb>
+<ke_inf>&oK;</ke_inf>
+</k_ele>
+<r_ele>
+<reb>やがて</reb>
+<re_pri>ichi1</re_pri>
+</r_ele>
+<sense>
+<pos>&adv;</pos>
+<misc>&uk;</misc>
+<gloss>before long</gloss>
+<gloss>soon</gloss>
+<gloss xml:lang="fre">avant longtemps</gloss>
+<gloss xml:lang="ger">(1) bald</gloss>
+<gloss xml:lang="ger">demnächst</gloss>
+<gloss xml:lang="ger">binnen kurzem</gloss>
+<gloss xml:lang="ger">in nächster Zeit</gloss>
+<gloss xml:lang="ger">(2) nach kurzem</gloss>
+<gloss xml:lang="ger">kurz danach</gloss>
+<gloss xml:lang="ger">nach einer kleinen Weile</gloss>
+<gloss xml:lang="hun">hamarosan</gloss>
+<gloss xml:lang="hun">korán</gloss>
+<gloss xml:lang="spa">dentro de poco</gloss>
+<gloss xml:lang="spa">pronto</gloss>
+<gloss xml:lang="spa">aproximadamente</gloss>
+</sense>
+<sense>
+<misc>&uk;</misc>
+<gloss>almost</gloss>
+<gloss>nearly</gloss>
+</sense>
+<sense>
+<misc>&uk;</misc>
+<gloss>finally</gloss>
+<gloss>in the end</gloss>
+<gloss>eventually</gloss>
+</sense>
+</entry>
+
+<entry>
+<ent_seq>1154320</ent_seq>
+<k_ele>
+<keb>あん摩</keb>
+<ke_pri>spec1</ke_pri>
+</k_ele>
+<k_ele>
+<keb>按摩</keb>
+</k_ele>
+<r_ele>
+<reb>あんま</reb>
+<re_pri>spec1</re_pri>
+</r_ele>
+<sense>
+<pos>&n;</pos>
+<pos>&vs;</pos>
+<gloss>massage, esp. the Anma Japanese type of massage</gloss>
+<gloss xml:lang="dut">(1) massage</gloss>
+<gloss xml:lang="dut">wrijfbeurt</gloss>
+<gloss xml:lang="dut">(2) masseur</gloss>
+<gloss xml:lang="dut">{scherts.} knijpdokter</gloss>
+<gloss xml:lang="dut">{scherts.} wrijfdokter</gloss>
+<gloss xml:lang="fre">massage</gloss>
+<gloss xml:lang="fre">masseur</gloss>
+<gloss xml:lang="ger">massieren</gloss>
+<gloss xml:lang="ger">(1) (f) Massage</gloss>
+<gloss xml:lang="ger">(2) (m) Masseur</gloss>
+<gloss xml:lang="ger">(f) Masseuse</gloss>
+<gloss xml:lang="ger">(3) (m) Blinder (weil Blinde früher sehr häufig als Masseur arbeiteten)</gloss>
+<gloss xml:lang="hun">gyúrás</gloss>
+<gloss xml:lang="hun">masszázs</gloss>
+<gloss xml:lang="hun">masszírozás</gloss>
+<gloss xml:lang="hun">gyúró</gloss>
+<gloss xml:lang="hun">masszőr</gloss>
+<gloss xml:lang="spa">(1) masaje</gloss>
+<gloss xml:lang="spa">(2) masajista</gloss>
+</sense>
+<sense>
+<pos>&n;</pos>
+<misc>&sens;</misc>
+<gloss>masseur</gloss>
+<gloss>masseuse</gloss>
+<gloss>massager</gloss>
+</sense>
+<sense>
+<misc>&arch;</misc>
+<misc>&col;</misc>
+<gloss>blind person (as many were traditionally massagers)</gloss>
+</sense>
+</entry>
 
 </JMdict>
