@@ -32,9 +32,9 @@ db.serialize(function() {
     console.time('Db inserts');
 
     console.log("kanjis");
-    insert(db, { table: "kanjis", data: data.getAllKanji(), properties: ["text", "ent_seq", "num_occurences"]});
+    insert(db, { table: "kanjis", data: data.getAllKanji(), properties: ["text", "ent_seq", "commonness", "num_occurences"]});
     console.log("kanas");
-    insert(db, { table: "kanas", data: data.getAllKana(), properties: ["text", "ent_seq", "romaji", "num_occurences"] });
+    insert(db, { table: "kanas", data: data.getAllKana(), properties: ["text", "ent_seq", "romaji", "commonness", "num_occurences"] });
     console.log("languages");
 
     insert(db, { table: "languages", data: data.getAllLanguages()});

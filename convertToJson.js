@@ -14,8 +14,8 @@ try {
 var service = {};
 
 console.time('readFile');
-// var jmdict = fs.readFileSync("JMdict");
-var jmdict = fs.readFileSync("example.xml");
+var jmdict = fs.readFileSync("JMdict");
+// var jmdict = fs.readFileSync("example.xml");
 console.timeEnd('readFile');
 
 // var allLanguages = ["ger", "eng", "hun", "spa", "slv", "fre", "dut"];
