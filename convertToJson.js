@@ -79,12 +79,14 @@ function toTitleCase(str)
 
 function convertToRomaji(str)
 {
-    return toTitleCase(hepburn.fromKana(str));
+    var romaji = toTitleCase(hepburn.fromKana(str));
+    romaji = romaji.replace(/["']/g, "");
+    return romaji;
 }
 
 function getKanjiKana(xml_entry, selector, textSelector, commonnessSelector, addRomaji){
     var gatherEntryInfo = [];
-    var ent_seq = xml_entry.get('ent_seq').text();
+    // var ent_seq = xml_entry.get('ent_seq').text();
     var kanjis_xml = xml_entry.find(selector);
     for (var i = 0; i < kanjis_xml.length; i++) {
         var kanji_xml = kanjis_xml[i];
@@ -333,6 +335,10 @@ function buildDictionary(){
                     num_occurences = occurenceMap[word] + commonness;
                 }
                 var kana = {text: word, ent_seq: ent_seq, romaji: convertToRomaji(word), commonness:commonness, num_occurences:num_occurences};
+                if (ent_seq === 1011920){
+                    console.log(kana.text);
+                    console.log(kana.romaji);
+                }
                 entry.kana.push(kana);
             }
         }
