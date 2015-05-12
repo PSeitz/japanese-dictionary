@@ -733,4 +733,65 @@ various information fields.
 </sense>
 </entry>
 
+
+<entry>
+<ent_seq>1358280</ent_seq>
+<k_ele>
+<keb>食べる</keb>
+<ke_pri>ichi1</ke_pri>
+<ke_pri>news2</ke_pri>
+<ke_pri>nf25</ke_pri>
+</k_ele>
+<k_ele>
+<keb>喰べる</keb>
+<ke_inf>&iK;</ke_inf>
+</k_ele>
+<r_ele>
+<reb>たべる</reb>
+<re_pri>ichi1</re_pri>
+<re_pri>news2</re_pri>
+<re_pri>nf25</re_pri>
+</r_ele>
+<sense>
+<pos>&v1;</pos>
+<pos>&vt;</pos>
+<gloss>to eat</gloss>
+<gloss xml:lang="dut">(1) eten</gloss>
+<gloss xml:lang="dut">opeten</gloss>
+<gloss xml:lang="dut">consumeren</gloss>
+<gloss xml:lang="dut">gebruiken</gloss>
+<gloss xml:lang="dut">nemen</gloss>
+<gloss xml:lang="dut">nuttigen</gloss>
+<gloss xml:lang="dut">verorberen</gloss>
+<gloss xml:lang="dut">naar binnen werken</gloss>
+<gloss xml:lang="dut">wegwerken</gloss>
+<gloss xml:lang="dut">{inform.} bikken</gloss>
+<gloss xml:lang="dut">{inform.} binnenslaan</gloss>
+<gloss xml:lang="dut">{i.h.b.} zich voeden met</gloss>
+<gloss xml:lang="dut">{uitdr.} de inwendige mens versterken</gloss>
+<gloss xml:lang="dut">(2) de kost verdienen</gloss>
+<gloss xml:lang="dut">aan de kost komen</gloss>
+<gloss xml:lang="dut">in zijn onderhoud voorzien</gloss>
+<gloss xml:lang="dut">leven (van)</gloss>
+<gloss xml:lang="fre">manger</gloss>
+<gloss xml:lang="ger">(1) essen</gloss>
+<gloss xml:lang="ger">speisen</gloss>
+<gloss xml:lang="ger">zu sich nehmen</gloss>
+<gloss xml:lang="ger">fressen</gloss>
+<gloss xml:lang="ger">probieren</gloss>
+<gloss xml:lang="ger">(2) leben von</gloss>
+<gloss xml:lang="hun">kiesz</gloss>
+<gloss xml:lang="rus">есть</gloss>
+<gloss xml:lang="slv">jesti</gloss>
+<gloss xml:lang="spa">comer</gloss>
+<gloss xml:lang="swe">äta</gloss>
+</sense>
+<sense>
+<gloss>to live on (e.g. a salary)</gloss>
+<gloss>to live off</gloss>
+<gloss>to subsist on</gloss>
+</sense>
+</entry>
+
+
 </JMdict>

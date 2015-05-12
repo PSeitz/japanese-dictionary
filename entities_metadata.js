@@ -10,27 +10,33 @@ entities = _.map(entities, function(value){
     return {short:short, long:long};
 });
 
+var entitiesMapLongShort = {};
 var entitiesMap = {};
 for (var i = 0; i < entities.length; i++) {
     var entityMapping = entities[i];
     // entitiesMap[entityMapping.short] = entityMapping.long;
     // entitiesMap[entityMapping.long] = entityMapping.short;
     entitiesMap[entityMapping.long] = i;
+    entitiesMapLongShort[entityMapping.long] = entityMapping.short;
 }
 
 service.getEntitiesMap = function(){
     return entitiesMap;
-}
+};
 
 // var indexMapLong = _.map(entities, "long");
 // console.log(indexMapLong);
 
 service.getEntitiesLongByIndex = function(index){
     return entities[index].long;
-}
+};
 
-service.getEntityIndexWithLong = function(longVersion){
+service.getEntityIndexForLongVersion = function(longVersion){
     return entitiesMap[longVersion];
-}
+};
+
+service.getShortForLongVersion = function(longVersion){
+    return entitiesMapLongShort[longVersion];
+};
 
 module.exports = service;

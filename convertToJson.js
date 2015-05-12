@@ -3,6 +3,7 @@ var libxmljs = require("libxmljs");
 var yaml = require('js-yaml');
 var _ = require('lodash');
 var hepburn = require("hepburn");
+var verbs = require('jp-conjugation');
 
 var config;
 try {
@@ -14,8 +15,8 @@ try {
 var service = {};
 
 console.time('readFile');
-var jmdict = fs.readFileSync("JMdict");
-// var jmdict = fs.readFileSync("example.xml");
+// var jmdict = fs.readFileSync("JMdict");
+var jmdict = fs.readFileSync("example.xml");
 console.timeEnd('readFile');
 
 // var allLanguages = ["ger", "eng", "hun", "spa", "slv", "fre", "dut"];
@@ -27,6 +28,8 @@ console.log(selectedLanguages);
 //     return value.split(";");
 // });
 // console.log(position_of_speech[0]);
+
+var allVerbTypes = ["v5u", "v5k", "v5k-s", "v5g", "v5s", "v5t", "v5m", "v5b", "v5n", "v5r", "v1"];
 
 var numOccurences = require("./numOccurencesFromExamples");
 var occurenceMap = numOccurences.getMap();
@@ -111,22 +114,25 @@ function containsString(string, array){
 }
 
 
+function positionalArguments (xml, options) {
+    var allPos = xml.find(".//pos");
+    return _.map(allPos, function(value){
+        if (options.onlyIndex) {
+            return entities_metadata.getEntityIndexForLongVersion(value.text());
+        }else if (options.shortVersion){
+            return entities_metadata.getShortForLongVersion(value.text());
+        }
+        else{
+            return value.text();
+        }
+    });
+}
+
 function getMeanings(xml_entry, options){
     var meanings = [];
     var senses_xml = xml_entry.find("sense");
 
     // function get 
-    function positionalArguments (sense_xml, onlyIndex) {
-        return _.map(sense_xml.find("pos"), function(value){
-            if (onlyIndex) {
-                return entities_metadata.getEntityIndexWithLong(value.text());
-            }else{
-                return value.text();
-            }
-
-        });
-    }
-    
     function getType (pos) {
         if(containsString("noun", pos)) return "noun";
         if(containsString("adverb", pos)) return "adverb";
@@ -138,7 +144,7 @@ function getMeanings(xml_entry, options){
     for (var i = 0; i < senses_xml.length; i++) {
         var sense_xml = senses_xml[i];
         var glosses_xml = sense_xml.find("gloss");
-        var pos = positionalArguments (sense_xml, false);
+        var pos = positionalArguments (sense_xml, {onlyIndex:false});
         for (var j = 0; j < glosses_xml.length; j++) {
             var gloss_xml = glosses_xml[j];
             var lang = gloss_xml.attr("lang");
@@ -285,6 +291,25 @@ function getText (elem) {
 }
 
 
+function getConjugated(verbTypes, entry){
+
+    if (verbTypes.length>0) {
+        var conjugated  = [];
+        for (var i = 0; i < verbTypes.length; i++) {
+            var verbType = verbTypes[i];
+            var accessor = entry.useKana ? "kana" : "kanji";
+            for (var j = 0; j < entry[accessor].length; j++) {
+                var elText = entry[accessor][j].text;
+                var results = verbs.conjugate(elText, verbType);
+                conjugated = conjugated.concat(results);
+            }
+        }
+        return conjugated;
+    }
+
+}
+
+
 function buildDictionary(){
     console.time('Build Dictionary');
     var json_entries = [];
@@ -377,13 +402,19 @@ function buildDictionary(){
 
         if (_.contains(entry.misc, "word usually written using kana alone")) entry.useKana = true;
 
+        var verbTypes = positionalArguments (xml_entry, {shortVersion:true});
+        verbTypes = _.filter(verbTypes, function(entry) {
+            return _.contains(allVerbTypes, entry);
+        });
+        entry.conjugated = getConjugated(verbTypes, entry);
+        console.log(entry.conjugated);
         json_entries.push(entry);
 
     }
 
     console.log(json_entries.length);
     json_entries = _.filter(json_entries, function(entry) {
-        return !_.contains(entry.misc, "archaism"); // "word usually written using kana alone"
+        return !_.contains(entry.misc, "archaism"); // "filter archaic words"
     });
     console.log(json_entries.length);
     console.timeEnd('Build Dictionary');
