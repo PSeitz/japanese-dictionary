@@ -15,8 +15,8 @@ try {
 var service = {};
 
 console.time('readFile');
-// var jmdict = fs.readFileSync("JMdict");
-var jmdict = fs.readFileSync("example.xml");
+var jmdict = fs.readFileSync("JMdict");
+// var jmdict = fs.readFileSync("example.xml");
 console.timeEnd('readFile');
 
 // var allLanguages = ["ger", "eng", "hun", "spa", "slv", "fre", "dut"];
@@ -286,29 +286,34 @@ function getAllLanguages () {
 // getAllKana();
 // getAllMeanings();
 
-function getText (elem) {
-    return elem.text();
-}
+// function getText (elem) {
+//     return elem.text();
+// }
 
 
-function getConjugated(verbTypes, entry){
+function addConjugations(verbTypes, entry){
 
     if (verbTypes.length>0) {
-        var conjugated  = [];
+        // var conjugated  = [];
         for (var i = 0; i < verbTypes.length; i++) {
             var verbType = verbTypes[i];
             var accessor = entry.useKana ? "kana" : "kanji";
             for (var j = 0; j < entry[accessor].length; j++) {
                 var elText = entry[accessor][j].text;
                 var results = verbs.conjugate(elText, verbType);
-                conjugated = conjugated.concat(results);
+                // conjugated = conjugated.concat(results);
+                entry[accessor][j].conjugated = results;
             }
         }
-        return conjugated;
+        // entry.conjugated = conjugated;
     }
 
 }
 
+
+function isVerbtype (entry) {
+    return _.contains(allVerbTypes, entry);
+}
 
 function buildDictionary(){
     console.time('Build Dictionary');
@@ -402,12 +407,9 @@ function buildDictionary(){
 
         if (_.contains(entry.misc, "word usually written using kana alone")) entry.useKana = true;
 
-        var verbTypes = positionalArguments (xml_entry, {shortVersion:true});
-        verbTypes = _.filter(verbTypes, function(entry) {
-            return _.contains(allVerbTypes, entry);
-        });
-        entry.conjugated = getConjugated(verbTypes, entry);
-        console.log(entry.conjugated);
+        var posArgs = positionalArguments (xml_entry, {shortVersion:true});
+        var verbTypes = _.filter(posArgs, isVerbtype);
+        addConjugations(verbTypes, entry);
         json_entries.push(entry);
 
     }
@@ -439,6 +441,24 @@ function getAllKana(){
     return collection;
 }
 
+function getAllKanaWithConjugations(){
+    var collection = [];
+    for (var i = 0; i < service.json_entries.length; i++) {
+        var entry = service.json_entries[i];
+        collection.push.apply(collection, entry.kana);
+    }
+    return collection;
+}
+
+function getAllKanjiWithConjugations(){
+    var collection = [];
+    for (var i = 0; i < service.json_entries.length; i++) {
+        var entry = service.json_entries[i];
+        collection.push.apply(collection, entry.kanji);
+    }
+    return collection;
+}
+
 function getAllKanji(){
     var collection = [];
     for (var i = 0; i < service.json_entries.length; i++) {
@@ -446,7 +466,6 @@ function getAllKanji(){
         collection.push.apply(collection, entry.kanji);
     }
     return collection;
-
 }
 
 function getAllMeanings(){
@@ -456,9 +475,10 @@ function getAllMeanings(){
         collection.push.apply(collection, entry.meanings);
     }
     return collection;
-
 }
 
+service.getAllKanaWithConjugations = getAllKanaWithConjugations;
+service.getAllKanjiWithConjugations = getAllKanjiWithConjugations;
 service.getAllKana = getAllKana;
 service.getAllKanji = getAllKanji;
 service.getAllMeanings = getAllMeanings;

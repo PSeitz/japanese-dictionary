@@ -23,6 +23,9 @@ db.serialize(function() {
 
     db.run("CREATE TABLE languages (_id INTEGER PRIMARY KEY, lang TEXT NOT NULL UNIQUE)");
 
+    db.run("CREATE TABLE kana_conjugations (_id INTEGER PRIMARY KEY, kana_id INTEGER NOT NULL, conjugated TEXT NOT NULL)");
+    db.run("CREATE TABLE kanji_conjugations (_id INTEGER PRIMARY KEY, kanji_id INTEGER NOT NULL, conjugated TEXT NOT NULL)");
+
     db.run("CREATE TABLE kanjis (_id INTEGER PRIMARY KEY, kanji TEXT NOT NULL, ent_seq INTEGER, commonness INTEGER, num_occurences INTEGER)");
     db.run("CREATE TABLE kanas (_id INTEGER PRIMARY KEY, kana TEXT NOT NULL, ent_seq INTEGER, romaji TEXT NOT NULL, commonness INTEGER, num_occurences INTEGER)");
     // db.run("CREATE VIRTUAL TABLE meanings USING fts3(_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )");
