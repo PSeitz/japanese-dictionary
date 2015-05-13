@@ -20,11 +20,16 @@ db.serialize(function() {
     db.run("DROP TABLE IF EXISTS kanas");
     db.run("DROP TABLE IF EXISTS meanings");
     db.run("DROP TABLE IF EXISTS languages");
+    db.run("DROP TABLE IF EXISTS kana_conjugations");
+    db.run("DROP TABLE IF EXISTS kanji_conjugations");
+    db.run("DROP TABLE IF EXISTS kanji_readings");
 
     db.run("CREATE TABLE languages (_id INTEGER PRIMARY KEY, lang TEXT NOT NULL UNIQUE)");
 
-    db.run("CREATE TABLE kana_conjugations (_id INTEGER PRIMARY KEY, kana_id INTEGER NOT NULL, conjugated TEXT NOT NULL)");
-    db.run("CREATE TABLE kanji_conjugations (_id INTEGER PRIMARY KEY, kanji_id INTEGER NOT NULL, conjugated TEXT NOT NULL)");
+    db.run("CREATE TABLE kanji_readings (_id INTEGER PRIMARY KEY, kanji_id INTEGER NOT NULL, kana_id INTEGER NOT NULL)");
+
+    db.run("CREATE TABLE kana_conjugations (_id INTEGER PRIMARY KEY, kana_id INTEGER NOT NULL, form TEXT NOT NULL)");
+    db.run("CREATE TABLE kanji_conjugations (_id INTEGER PRIMARY KEY, kanji_id INTEGER NOT NULL, form TEXT NOT NULL)");
 
     db.run("CREATE TABLE kanjis (_id INTEGER PRIMARY KEY, kanji TEXT NOT NULL, ent_seq INTEGER, commonness INTEGER, num_occurences INTEGER)");
     db.run("CREATE TABLE kanas (_id INTEGER PRIMARY KEY, kana TEXT NOT NULL, ent_seq INTEGER, romaji TEXT NOT NULL, commonness INTEGER, num_occurences INTEGER)");
@@ -56,6 +61,8 @@ db.serialize(function() {
         }
     });
 
+    
+
     db.run("CREATE INDEX kana_index ON kanas(kana)");
     db.run("CREATE INDEX kanji_index ON kanjis(kanji)");
     db.run("CREATE INDEX meaning_index ON meanings(meaning)");
@@ -64,50 +71,65 @@ db.serialize(function() {
     db.run("CREATE INDEX kanji_ent_seqs ON kanjis(ent_seq)");
     db.run("CREATE INDEX meaning_ent_seqs ON meanings(ent_seq)");
 
+    insert(db, {
+        table: "kanji_conjugations",
+        tablefields: ["_id", "kanji_id", "form"],
+        data: data.getAllKanjiWithConjugations(),
+        properties: ["stem", "form"],
+        fk: {
+            "stem": {
+                table: "kanjis",
+                field: "_id",
+                value: "kanji"
+            }
+        }
+    });
+    
+
+    insert(db, {
+        table: "kana_conjugations",
+        tablefields: ["_id", "kana_id", "form"],
+        data: data.getAllKanaWithConjugations(),
+        properties: ["stem", "form"],
+        fk: {
+            "stem": {
+                table: "kanas",
+                field: "_id",
+                value: "kana"
+            }
+        }
+    });
+
+
+    insert(db, {
+        table: "kanji_readings",
+        tablefields: ["_id", "kanji_id", "kana_id"],
+        data: data.getKanjiReadings(),
+        properties: ["kanji", "reading"],
+        fk: {
+            "kanji": {
+                table: "kanjis",
+                field: "_id",
+                values: ["ent_seq", "kanji"]
+            },
+            "reading": {
+                table: "kanas",
+                field: "_id",
+                values: ["ent_seq", "reading"]
+            }
+        }
+    });
+
+
+
+    
+
+    db.run("CREATE INDEX kana_conjugations_ix ON kana_conjugations(form)");
+    db.run("CREATE INDEX kanji_conjugations_ix ON kanji_conjugations(form)");
+
     console.timeEnd('Db inserts');
 
 });
-
-
-// db = new sqlite3.Database('meanings.sqlite');
-// db.serialize(function() {
-
-//     // INSERT INTO “android_metadata” VALUES (‘en_US’)
-
-//     db.run("DROP TABLE IF EXISTS android_metadata");
-//     db.run("CREATE TABLE \"android_metadata\" (\"locale\" TEXT DEFAULT 'en_US')");
-//     db.run("INSERT INTO \"android_metadata\" VALUES ('en_US')");
-
-//     db.run("DROP TABLE IF EXISTS meanings");
-//     db.run("DROP TABLE IF EXISTS languages");
-
-//     db.run("CREATE TABLE languages (_id INTEGER PRIMARY KEY, lang TEXT NOT NULL UNIQUE)");
-//     db.run("CREATE TABLE meanings (_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )");
-//     // db.run("CREATE TABLE entries (_id INTEGER PRIMARY KEY, ent_seq INTEGER, meaning lang, kanji  FOREIGN KEY(trackartist) REFERENCES artist(artistid))");
-
-//     console.time('Db inserts');
-
-//     console.log("languages");
-//     insert(db, { table: "languages", data: data.getAllLanguages()});
-//     console.log("meanings");
-//     insert(db, {
-//         table: "meanings",
-//         data: data.getAllMeanings(),
-//         properties: ["text", "lang", "ent_seq"],
-//         fk: {
-//             "lang": {
-//                 table: "languages",
-//                 field: "_id",
-//                 value: "lang"
-//             }
-//         }
-//     });
-
-//     db.run("CREATE INDEX meaning_ent_seqs ON meanings(ent_seq)");
-
-//     console.timeEnd('Db inserts');
-
-// });
 
 
 
@@ -146,7 +168,6 @@ function insert(db, options){
             argumentos.push(entry);
         }
         
-
         // (_id, meaning, lang, ent_seq )
         var query;
         if (options.tablefields) query = "INSERT INTO "+options.table + "("+options.tablefields.join(",")+")" +" VALUES ("+databinding.join(",")+")";

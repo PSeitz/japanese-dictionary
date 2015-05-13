@@ -794,4 +794,97 @@ various information fields.
 </entry>
 
 
+<entry>
+<ent_seq>1000230</ent_seq>
+<k_ele>
+<keb>明かん</keb>
+</k_ele>
+<r_ele>
+<reb>あかん</reb>
+</r_ele>
+<r_ele>
+<reb>アカン</reb>
+<re_nokanji/>
+</r_ele>
+<sense>
+<pos>&exp;</pos>
+<misc>&uk;</misc>
+<dial>&ksb;</dial>
+<gloss>useless</gloss>
+<gloss>no good</gloss>
+<gloss>hopeless</gloss>
+<gloss xml:lang="ger">(1) schlecht</gloss>
+<gloss xml:lang="ger">mies</gloss>
+<gloss xml:lang="ger">blöd zwecklos</gloss>
+<gloss xml:lang="ger">umsonst</gloss>
+<gloss xml:lang="ger">(2) zu nichts nutze</gloss>
+<gloss xml:lang="ger">nutzlos</gloss>
+<gloss xml:lang="ger">(3) unmöglich</gloss>
+<gloss xml:lang="spa">inútil</gloss>
+<gloss xml:lang="spa">no bueno</gloss>
+<gloss xml:lang="spa">sin esperanza</gloss>
+</sense>
+</entry>
+
+
+<entry>
+<ent_seq>1005930</ent_seq>
+<k_ele>
+<keb>じゃが芋</keb>
+<ke_pri>spec1</ke_pri>
+</k_ele>
+<k_ele>
+<keb>ジャガ芋</keb>
+<ke_pri>ichi1</ke_pri>
+<ke_pri>spec2</ke_pri>
+</k_ele>
+<k_ele>
+<keb>馬鈴薯</keb>
+</k_ele>
+<r_ele>
+<reb>じゃがいも</reb>
+<re_restr>じゃが芋</re_restr>
+<re_restr>馬鈴薯</re_restr>
+<re_pri>spec1</re_pri>
+</r_ele>
+<r_ele>
+<reb>ジャガいも</reb>
+<re_restr>ジャガ芋</re_restr>
+<re_pri>ichi1</re_pri>
+<re_pri>spec2</re_pri>
+</r_ele>
+<r_ele>
+<reb>ジャガイモ</reb>
+<re_nokanji/>
+</r_ele>
+<r_ele>
+<reb>ばれいしょ</reb>
+<re_restr>馬鈴薯</re_restr>
+<re_pri>spec1</re_pri>
+</r_ele>
+<sense>
+<pos>&n;</pos>
+<xref>ジャガタラ芋</xref>
+<misc>&uk;</misc>
+<gloss>potato (Solanum tuberosum)</gloss>
+<gloss xml:lang="dut">(1) {plantk.} aardappel</gloss>
+<gloss xml:lang="dut">aardappelplant</gloss>
+<gloss xml:lang="dut">Solanum tuberosum</gloss>
+<gloss xml:lang="dut">(2) {cul.} aardappel</gloss>
+<gloss xml:lang="fre">patate</gloss>
+<gloss xml:lang="ger">(f) Kartoffel</gloss>
+<gloss xml:lang="ger">Solanum tuberosum</gloss>
+<gloss xml:lang="ger">(f) Kartoffel</gloss>
+<gloss xml:lang="hun">burgonya</gloss>
+<gloss xml:lang="hun">krumpli</gloss>
+<gloss xml:lang="rus">картофель</gloss>
+<gloss xml:lang="spa">papa</gloss>
+<gloss xml:lang="spa">patata</gloss>
+<gloss xml:lang="spa">patata</gloss>
+<gloss xml:lang="spa">papa</gloss>
+<gloss xml:lang="spa">papa</gloss>
+<gloss xml:lang="spa">patata</gloss>
+</sense>
+</entry>
+
 </JMdict>

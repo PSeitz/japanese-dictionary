@@ -15,8 +15,8 @@ try {
 var service = {};
 
 console.time('readFile');
-var jmdict = fs.readFileSync("JMdict");
-// var jmdict = fs.readFileSync("example.xml");
+// var jmdict = fs.readFileSync("JMdict");
+var jmdict = fs.readFileSync("example.xml");
 console.timeEnd('readFile');
 
 // var allLanguages = ["ger", "eng", "hun", "spa", "slv", "fre", "dut"];
@@ -311,6 +311,28 @@ function addConjugations(verbTypes, entry){
 }
 
 
+function getReadingsForKanji (xml_entry, kanji) {
+    var readings = [];
+    var kanasForEntry = xml_entry.find('r_ele');
+    for (var i = 0; i < kanasForEntry.length; i++) {
+        if(kanasForEntry[i].get("re_nokanji")) continue;
+
+        var re_restr = kanasForEntry[i].find(".//re_restr");
+        if (re_restr.length > 0) {
+            re_restr = _.map(re_restr, function(value){
+                return value.text();
+            });
+            if (re_restr.indexOf(kanji) === -1) {
+                continue;
+            }
+        }
+        readings.push(kanasForEntry[i].get("reb").text());
+    }
+
+    return readings;
+}
+
+
 function isVerbtype (entry) {
     return _.contains(allVerbTypes, entry);
 }
@@ -349,6 +371,9 @@ function buildDictionary(){
                 num_occurences = occurenceMap[word] + commonness;
                 // kanjiMap[word] = {text: kanjiMap[word], ent_seq: ent_seq};
                 var kanji = {text: word, ent_seq: ent_seq, commonness:commonness, num_occurences:num_occurences};
+                kanji.readings = getReadingsForKanji(xml_entry, kanji.text);
+                console.log(kanji.readings);
+                // console.log(kanji.readings);
                 entry.kanji.push(kanji);
             }
         }
@@ -432,51 +457,74 @@ buildDictionary();
 // fs.writeFileSync("jmdict.json", JSON.stringify(service.json_entries, null, 2), 'utf8');
 // fs.writeFileSync("jmdict.json", JSON.stringify(service.json_entries), 'utf8');
 
-function getAllKana(){
+
+
+function getKanjiReadings(){
     var collection = [];
     for (var i = 0; i < service.json_entries.length; i++) {
         var entry = service.json_entries[i];
-        collection.push.apply(collection, entry.kana);
+        var kanjis = entry.kanji;
+        for (var j = 0; j < kanjis.length; j++) {
+            var kanji = kanjis[j];
+            for (var k = 0; k < kanji.readings.length; k++) {
+                collection.push({
+                    kanji : kanji.text,
+                    ent_seq : entry.ent_seq,
+                    reading : kanji.readings[k]
+                });
+            }
+        }
     }
     return collection;
 }
 
 function getAllKanaWithConjugations(){
-    var collection = [];
-    for (var i = 0; i < service.json_entries.length; i++) {
-        var entry = service.json_entries[i];
-        collection.push.apply(collection, entry.kana);
-    }
-    return collection;
+    return getConjugations("kana");
 }
-
 function getAllKanjiWithConjugations(){
+    return getConjugations("kanji");
+}
+function getConjugations(property){
+
+    var elements = collect(property);
+    console.time('Conjugations for :'+property);
     var collection = [];
-    for (var i = 0; i < service.json_entries.length; i++) {
-        var entry = service.json_entries[i];
-        collection.push.apply(collection, entry.kanji);
+    for (var j = 0; j < elements.length; j++) {
+        var kanji_kana = elements[j];
+        if (kanji_kana.conjugated && kanji_kana.conjugated.length>0) {
+            for (var k = 0; k < kanji_kana.conjugated.length; k++) {
+                collection.push({
+                    stem:kanji_kana.text,
+                    form:kanji_kana.conjugated[k].form,
+                    name:kanji_kana.conjugated[k].name,
+                });
+            }
+        }
     }
+    console.timeEnd('Conjugations for :'+property);
     return collection;
 }
 
+function getAllKana(){
+    return collect("kana");
+}
 function getAllKanji(){
-    var collection = [];
-    for (var i = 0; i < service.json_entries.length; i++) {
-        var entry = service.json_entries[i];
-        collection.push.apply(collection, entry.kanji);
-    }
-    return collection;
+    return collect("kanji");
 }
-
 function getAllMeanings(){
+    return collect("meanings");
+}
+
+function collect(propName){
     var collection = [];
     for (var i = 0; i < service.json_entries.length; i++) {
         var entry = service.json_entries[i];
-        collection.push.apply(collection, entry.meanings);
+        collection.push.apply(collection, entry[propName]);
     }
     return collection;
 }
 
+service.getKanjiReadings = getKanjiReadings;
 service.getAllKanaWithConjugations = getAllKanaWithConjugations;
 service.getAllKanjiWithConjugations = getAllKanjiWithConjugations;
 service.getAllKana = getAllKana;
