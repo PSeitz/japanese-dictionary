@@ -101,28 +101,41 @@ db.serialize(function() {
     });
 
 
-    insert(db, {
-        table: "kanji_readings",
-        tablefields: ["_id", "kanji_id", "kana_id"],
-        data: data.getKanjiReadings(),
-        properties: ["kanji", "reading"],
-        fk: {
-            "kanji": {
-                table: "kanjis",
-                field: "_id",
-                values: ["ent_seq", "kanji"]
-            },
-            "reading": {
-                table: "kanas",
-                field: "_id",
-                values: ["ent_seq", "reading"]
-            }
-        }
-    });
-
-
-
+    // insert(db, {
+    //     table: "kanji_readings",
+    //     tablefields: ["_id", "kanji_id", "kana_id"],
+    //     data: data.getKanjiReadings(),
+    //     properties: ["kanji", "reading"],
+    //     fk: {
+    //         "kanji": {
+    //             table: "kanjis",
+    //             field: "_id",
+    //             values: ["ent_seq", "kanji"]
+    //         },
+    //         "reading": {
+    //             table: "kanas",
+    //             field: "_id",
+    //             values: ["ent_seq", "reading"]
+    //         }
+    //     }
+    // });
+    var tablefields =  ["_id", "kanji_id", "kana_id"];
+    var readings = data.getKanjiReadings();
+    db.run("BEGIN TRANSACTION");
+    for (var i = 0; i < readings.length; i++) {
+        var reading = readings[i];
+        var argumentos = Array(3);
+        argumentos[0] = i;
+        argumentos[1] = "(SELECT _id from kanjis WHERE kanji='"+reading.kanji+"' AND ent_seq='"+reading.ent_seq+"')";
+        argumentos[2] = "(SELECT _id from kanas WHERE kana='"+reading.reading+"' AND ent_seq='"+reading.ent_seq+"')";
+        var query = "INSERT INTO kanji_readings ("+tablefields.join(",")+")" +" VALUES ("+argumentos.join(",")+")";
+        db.run(query);
+        
+    }
     
+    db.run("END");
+
+    db.run("CREATE INDEX kanji_readings_ix ON kanji_readings(kanji_id)");
 
     db.run("CREATE INDEX kana_conjugations_ix ON kana_conjugations(form)");
     db.run("CREATE INDEX kanji_conjugations_ix ON kanji_conjugations(form)");

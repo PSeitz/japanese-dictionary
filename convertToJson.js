@@ -15,8 +15,8 @@ try {
 var service = {};
 
 console.time('readFile');
-// var jmdict = fs.readFileSync("JMdict");
-var jmdict = fs.readFileSync("example.xml");
+var jmdict = fs.readFileSync("JMdict");
+// var jmdict = fs.readFileSync("example.xml");
 console.timeEnd('readFile');
 
 // var allLanguages = ["ger", "eng", "hun", "spa", "slv", "fre", "dut"];
@@ -355,6 +355,7 @@ function buildDictionary(){
                 //lang: ger, text: blubber, type: noun, etc.
             ]
         };
+        entry.ent_seq = ent_seq;
         // entry.kanji = getKanjiKana(xml_entry, 'k_ele', 'keb', 'ke_pri'); // kanji
         // entry.kana = getKanjiKana(xml_entry, 'r_ele', 'reb', 're_pri', true); //  kana/reading
         // entry.meanings = getMeanings(xml_entry);
@@ -372,7 +373,6 @@ function buildDictionary(){
                 // kanjiMap[word] = {text: kanjiMap[word], ent_seq: ent_seq};
                 var kanji = {text: word, ent_seq: ent_seq, commonness:commonness, num_occurences:num_occurences};
                 kanji.readings = getReadingsForKanji(xml_entry, kanji.text);
-                console.log(kanji.readings);
                 // console.log(kanji.readings);
                 entry.kanji.push(kanji);
             }
