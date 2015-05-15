@@ -23,8 +23,14 @@ db.serialize(function() {
     db.run("DROP TABLE IF EXISTS kana_conjugations");
     db.run("DROP TABLE IF EXISTS kanji_conjugations");
     db.run("DROP TABLE IF EXISTS kanji_readings");
+    db.run("DROP TABLE IF EXISTS misc");
+    db.run("DROP TABLE IF EXISTS entry_misc");
 
     db.run("CREATE TABLE languages (_id INTEGER PRIMARY KEY, lang TEXT NOT NULL UNIQUE)");
+
+    db.run("CREATE TABLE entry_misc (_id INTEGER PRIMARY KEY, ent_seq INTEGER NOT NULL, misc_id INTEGER NOT NULL)");
+
+    db.run("CREATE TABLE misc (_id INTEGER PRIMARY KEY, misc TEXT NOT NULL)");
 
     db.run("CREATE TABLE kanji_readings (_id INTEGER PRIMARY KEY, kanji_id INTEGER NOT NULL, kana_id INTEGER NOT NULL)");
 
@@ -46,6 +52,7 @@ db.serialize(function() {
     console.log("languages");
 
     insert(db, { table: "languages", data: data.getAllLanguages()});
+    insert(db, { table: "misc", data: data.getAllMisc()});
     console.log("meanings");
     insert(db, {
         table: "meanings",
@@ -99,6 +106,22 @@ db.serialize(function() {
             }
         }
     });
+    
+    insert(db, {
+        // log: true,
+        table: "entry_misc",
+        tablefields: ["_id", "ent_seq", "misc_id"],
+        data: data.getAllMiscWithEntSeq(),
+        properties: ["ent_seq", "misc"],
+        fk: {
+            "misc": {
+                table: "misc",
+                field: "_id",
+                value: "misc"
+            }
+        }
+    });
+
 
 
     // insert(db, {
@@ -147,7 +170,6 @@ db.serialize(function() {
 
 
 function insert(db, options){
-    var data = options.data;
 
     db.run("BEGIN TRANSACTION");
     console.time('Db inserts');
@@ -162,8 +184,8 @@ function insert(db, options){
     _.fill(databinding, '?');
 
     // stmt = db.prepare( "INSERT INTO "+options.table+" VALUES ("+questionmarks+")");
-    for (var i = 0; i < data.length; i++) {
-        var entry = data[i];
+    for (var i = 0; i < options.data.length; i++) {
+        var entry = options.data[i];
         var argumentos = [i];
         if (options.properties) {
             for (var k = 0; k < options.properties.length; k++) {
@@ -172,6 +194,7 @@ function insert(db, options){
                     var value = entry[property];
                     value = value.replace(/'/g, "''");
                     var select = "(SELECT "+options.fk[property].field+" from "+options.fk[property].table+" WHERE "+options.fk[property].value+"='"+value+"')";
+
                     databinding[k+1] = select;
                 }else{
                     argumentos.push(entry[property]);
@@ -185,6 +208,8 @@ function insert(db, options){
         var query;
         if (options.tablefields) query = "INSERT INTO "+options.table + "("+options.tablefields.join(",")+")" +" VALUES ("+databinding.join(",")+")";
         else query = "INSERT INTO "+options.table +" VALUES ("+databinding.join(",")+")";
+
+        if (options.log) console.log(query);
         db.run(query, argumentos);
 
         // stmt.run.apply(stmt, argumentos);

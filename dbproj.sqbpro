@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/Users/d056831/Development/japanese-dictionary/jmdict.sqlite"/><window><current_tab id="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1087"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="android_metadata"/><column_widths data="AAAAAQAAACAAYQBuAGQAcgBvAGkAZABfAG0AZQB0AGEAZABhAHQAYQAAAAEAAAAAAAAAAA=="/><sort column="0" order="0"/></tab_browse><tab_sql><sql name="SQL 1">SELECT * from kanjis
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/Users/d056831/Development/japanese-dictionary/jmdict.sqlite"/><window><current_tab id="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1039"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="entry_misc"/><column_widths data="AAAABAAAAAgAbQBpAHMAYwAAAAEAAAACAAABLgAAAAwAawBhAG4AagBpAHMAAAABAAAAAgAAAGQAAAAUAGUAbgB0AHIAeQBfAG0AaQBzAGMAAAABAAAAAgAAAGQAAAAgAGEAbgBkAHIAbwBpAGQAXwBtAGUAdABhAGQAYQB0AGEAAAABAAAAAAAAAAA="/><sort column="0" order="0"/></tab_browse><tab_sql><sql name="SQL 1">SELECT * from kanjis
 WHERE ent_seq IN( SELECT ent_seq FROM meanings WHERE meaning LIKE &quot;%ankommen&quot; )
 ORDER BY num_occurences DESC;
 
@@ -25,4 +25,17 @@ SELECT * FROM meanings;
 INSERT INTO meanings_fts(_id, meaning, lang, ent_seq ) VALUES(10, 'test', 1, 10);
 
 
-CREATE TABLE meanings (_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )</sql><current_tab id="0"/></tab_sql></sqlb_project>
+CREATE TABLE meanings (_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )
+
+
+SELECT kana from kanas WHERE _id in(
+
+            SELECT kana_id from kanjis k
+            JOIN kanji_readings r ON k._id = r.kanji_id
+            WHERE kanji='酷い' AND ent_seq='1602060'
+
+SELECT COUNT(*)
+FROM
+
+Select misc FROM  misc m 
+JOIN (Select misc_id from entry_misc WHERE ent_seq = '1001500' ) a ON a.misc_id = m._id</sql><current_tab id="0"/></tab_sql></sqlb_project>

@@ -337,6 +337,8 @@ function isVerbtype (entry) {
     return _.contains(allVerbTypes, entry);
 }
 
+var allMisc = {};
+
 function buildDictionary(){
     console.time('Build Dictionary');
     var json_entries = [];
@@ -414,8 +416,7 @@ function buildDictionary(){
                 var meaning = {text: text, lang:lang, ent_seq: ent_seq};
                 entry.meanings.push(meaning);
             }
-
-        }
+        }        
 
         // Merge misc into entry
         var senses = xml_entry.find('sense');
@@ -427,7 +428,10 @@ function buildDictionary(){
                     entry.misc = _.intersection(entry.misc, miscs);
                 }
             }
+        }
 
+        for (var p = 0; p < entry.misc.length; p++) {
+            allMisc[entry.misc[p]] = true;
         }
 
         if (_.contains(entry.misc, "word usually written using kana alone")) entry.useKana = true;
@@ -524,6 +528,31 @@ function collect(propName){
     return collection;
 }
 
+function getAllMiscWithEntSeq(){
+    var collection = [];
+    for (var i = 0; i < service.json_entries.length; i++) {
+        var entry = service.json_entries[i];
+        for (var j = 0; j < entry.misc.length; j++) {
+            collection.push({
+                misc:entry.misc[j],
+                ent_seq:entry.ent_seq
+            });
+        }
+    }
+    return collection;
+}
+
+
+service.getAllMisc = function(){
+    var arrMisc = [];
+    for(var prop in allMisc){
+        arrMisc.push(prop);
+    }
+    console.log(arrMisc);
+    return arrMisc;
+};
+
+service.getAllMiscWithEntSeq = getAllMiscWithEntSeq;
 service.getKanjiReadings = getKanjiReadings;
 service.getAllKanaWithConjugations = getAllKanaWithConjugations;
 service.getAllKanjiWithConjugations = getAllKanjiWithConjugations;
