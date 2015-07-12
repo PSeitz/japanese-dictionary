@@ -69,7 +69,7 @@ db.serialize(function() {
     });
 
     
-
+    console.log("indices");
     db.run("CREATE INDEX kana_index ON kanas(kana)");
     db.run("CREATE INDEX kanji_index ON kanjis(kanji)");
     db.run("CREATE INDEX meaning_index ON meanings(meaning)");
@@ -78,6 +78,8 @@ db.serialize(function() {
     db.run("CREATE INDEX kanji_ent_seqs ON kanjis(ent_seq)");
     db.run("CREATE INDEX meaning_ent_seqs ON meanings(ent_seq)");
 
+
+    console.log("kanji_conjugations");
     insert(db, {
         table: "kanji_conjugations",
         tablefields: ["_id", "kanji_id", "form"],
@@ -92,7 +94,7 @@ db.serialize(function() {
         }
     });
     
-
+    console.log("kana_conjugations");
     insert(db, {
         table: "kana_conjugations",
         tablefields: ["_id", "kana_id", "form"],
@@ -107,6 +109,7 @@ db.serialize(function() {
         }
     });
     
+    console.log("misc");
     insert(db, {
         // log: true,
         table: "entry_misc",
@@ -142,6 +145,8 @@ db.serialize(function() {
     //         }
     //     }
     // });
+
+    console.log("readings");
     var tablefields =  ["_id", "kanji_id", "kana_id"];
     var readings = data.getKanjiReadings();
     db.run("BEGIN TRANSACTION");
@@ -157,7 +162,8 @@ db.serialize(function() {
     }
     
     db.run("END");
-
+    
+    console.log("more_indices");
     db.run("CREATE INDEX kanji_readings_ix ON kanji_readings(kanji_id)");
 
     db.run("CREATE INDEX kana_conjugations_ix ON kana_conjugations(form)");
