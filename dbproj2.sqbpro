@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="C:/Development/japanese-dictionary/jmdict.sqlite"/><window><current_tab id="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="882"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="kanas"/><column_widths data="AAAAAQAAACAAYQBuAGQAcgBvAGkAZABfAG0AZQB0AGEAZABhAHQAYQAAAAEAAAAAAAAAAA=="/><sort column="0" order="0"/></tab_browse><tab_sql><sql name="SQL 1">SELECT * from kanji_conjugations
+WHERE form LIKE &quot;%あります%&quot;
+
+SELECT * from kana_conjugations
+WHERE form LIKE &quot;%あります%&quot;
+
+SELECT * from kanji_conjugations
+WHERE form = &quot;食べます&quot;
+
+SELECT * from kanji_conjugations
+WHERE form LIKE &quot;在ります&quot;
+
+SELECT * from kana_conjugations
+WHERE form = &quot;あります&quot;
+
+
+ある
+
+SELECT * from kanas
+WHERE kana = &quot;ある&quot;</sql><current_tab id="0"/></tab_sql></sqlb_project>

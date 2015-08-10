@@ -29,7 +29,7 @@ console.log(selectedLanguages);
 // });
 // console.log(position_of_speech[0]);
 
-var allVerbTypes = ["v5u", "v5k", "v5k-s", "v5g", "v5s", "v5t", "v5m", "v5b", "v5n", "v5r", "v1"];
+var allVerbTypes = ["v5u", "v5k", "v5k-s", "v5g", "v5s", "v5t", "v5m", "v5b", "v5n", "v5r", "v5r-i", "v1"];
 
 var numOccurences = require("./numOccurencesFromExamples");
 var occurenceMap = numOccurences.getMap();
@@ -292,18 +292,26 @@ function getAllLanguages () {
 
 
 function addConjugations(verbTypes, entry){
-
     if (verbTypes.length>0) {
         // var conjugated  = [];
         for (var i = 0; i < verbTypes.length; i++) {
             var verbType = verbTypes[i];
-            var accessor = entry.useKana ? "kana" : "kanji";
-            for (var j = 0; j < entry[accessor].length; j++) {
-                var elText = entry[accessor][j].text;
-                var results = verbs.conjugate(elText, verbType);
+            // var accessor = entry.useKana ? "kana" : "kanji";
+            var elText, results, j;
+            for (j = 0; j < entry.kana.length; j++) {
+                elText = entry.kana[j].text;
+                results = verbs.conjugate(elText, verbType);
                 // conjugated = conjugated.concat(results);
-                entry[accessor][j].conjugated = results;
+                entry.kana[j].conjugated = results;
             }
+
+            for (j = 0; j < entry.kanji.length; j++) {
+                elText = entry.kanji[j].text;
+                results = verbs.conjugate(elText, verbType);
+                // conjugated = conjugated.concat(results);
+                entry.kanji[j].conjugated = results;
+            }
+
         }
         // entry.conjugated = conjugated;
     }
