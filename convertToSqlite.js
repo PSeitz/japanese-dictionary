@@ -26,7 +26,7 @@ db.serialize(function() {
     db.run("DROP TABLE IF EXISTS misc");
     db.run("DROP TABLE IF EXISTS entry_misc");
 
-    db.run("CREATE TABLE languages (_id INTEGER PRIMARY KEY, lang TEXT NOT NULL UNIQUE)");
+    db.run("CREATE TABLE languages (_id INTEGER PRIMARY KEY, lang TEXT NOT NULL UNIQUE collate nocase)");
 
     db.run("CREATE TABLE entry_misc (_id INTEGER PRIMARY KEY, ent_seq INTEGER NOT NULL, misc_id INTEGER NOT NULL)");
 
@@ -41,7 +41,7 @@ db.serialize(function() {
     db.run("CREATE TABLE kanas (_id INTEGER PRIMARY KEY, kana TEXT NOT NULL, ent_seq INTEGER, romaji TEXT NOT NULL, commonness INTEGER, num_occurences INTEGER)");
     // db.run("CREATE VIRTUAL TABLE meanings USING fts3(_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )");
     // db.run("CREATE TABLE entries (_id INTEGER PRIMARY KEY, ent_seq INTEGER, meaning lang, kanji  FOREIGN KEY(trackartist) REFERENCES artist(artistid))");
-    db.run("CREATE TABLE meanings (_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )");
+    db.run("CREATE TABLE meanings (_id INTEGER PRIMARY KEY, meaning TEXT collate nocase, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )");
 
     console.time('Db inserts');
 
@@ -77,7 +77,7 @@ db.serialize(function() {
     db.run("CREATE INDEX kana_ent_seqs ON kanas(ent_seq)");
     db.run("CREATE INDEX kanji_ent_seqs ON kanjis(ent_seq)");
     db.run("CREATE INDEX meaning_ent_seqs ON meanings(ent_seq)");
-
+    db.run("CREATE INDEX misc_ent_seqs ON entry_misc(ent_seq)");
 
     console.log("kanji_conjugations");
     insert(db, {

@@ -20,10 +20,10 @@ console.timeEnd('Filter');
 var numOccurences = {};
 
 for (var i = 0; i < examples.length; i++) {
-    examples[i] = examples[i].substring(2, examples[i].length); // remove ( )
+    examples[i] = examples[i].substring(2, examples[i].length); // remove B:
     examples[i] = examples[i].replace(/ *\([^)]*\) */g, " "); // remove ( )
     examples[i] = examples[i].replace(/ *\{[^}]*\} */g, " "); // remove { }
-    examples[i] = examples[i].replace(/ *\[[^\]]*\] */g, " ");// remove [ ]
+    examples[i] = examples[i].replace(/ *\[[^\]]*\] */g, " ");// remove [ ] -> sense index
     examples[i] = examples[i].trim();
     examples[i] = examples[i].replace(/\s{2,}/g, ' ');// convert all spaces to single spaces
     examples[i] = examples[i].split(" ");

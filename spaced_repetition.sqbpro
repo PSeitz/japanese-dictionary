@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="C:/Development/japanese-dictionary/spaced_repetition"/><window><current_tab id="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="610"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="learn"/><column_widths data="AAAAAQAAAAoAbABlAGEAcgBuAAAAAwAAAAUAAADTAAAABAAAAJYAAAAAAAAAAA=="/><sort column="0" order="0"/></tab_browse><tab_sql><sql name="SQL 1">SELECT datetime('now');
+
+SELECT strftime('%s','now');
+
+SELECT (julianday('now'))
+
+SELECT strftime('%y%s','now');
+
+INSERT INTO learn(ent_seq, score, repetitionBoost, lastTry) VALUES(1, 0, 0, (SELECT datetime('now'));
+
+INSERT INTO learn(ent_seq, score, lastTry, nextTry) VALUES(1, 0, (SELECT datetime('now')), (SELECT datetime('now','+20 seconds')) );
+INSERT INTO learn(ent_seq, score, lastTry, nextTry) VALUES(2, 0, (SELECT datetime('now')), (SELECT datetime('now','+10 minutes')) );
+INSERT INTO learn(ent_seq, score, lastTry, nextTry) VALUES(3, 0, (SELECT datetime('now')), (SELECT datetime('now','+9 hour')));
+INSERT INTO learn(ent_seq, score, lastTry, nextTry) VALUES(4, 0, (SELECT datetime('now')), (SELECT datetime('now','+4 day')));
+INSERT INTO learn(ent_seq, score, lastTry, nextTry) VALUES(5, 0, (SELECT datetime('now')), (SELECT datetime('now','+8 day')));
+INSERT INTO learn(ent_seq, score, lastTry, nextTry) VALUES(6, 0, (SELECT datetime('now')), (SELECT datetime('now','+1 month')));
+
+INSERT INTO learn(ent_seq, score, lastTry, nextTry) VALUES(7, 0, (SELECT datetime('now')), (SELECT datetime('now','+20 seconds')) );
+INSERT INTO learn(ent_seq, score, lastTry, nextTry) VALUES(8, 0, (SELECT datetime('now')), (SELECT datetime('now','+20 seconds')) );
+INSERT INTO learn(ent_seq, score, lastTry, nextTry) VALUES(9, 0, (SELECT datetime('now')), (SELECT datetime('now','+20 seconds')) );
+
+
+Select ent_seq, repetitionBoost, score
+FROM learn
+WHERE ent_seq &lt;&gt; (Select ent_seq 
+From learn 
+ORDER BY lastTry desc
+LIMIT 1 )
+AND ent_seq IN(Select ent_seq 
+From learn 
+ORDER BY score desc
+LIMIT 5 )
+ORDER BY nextTry DESC;
+
+DROP TABLE 'learn';
+
+CREATE TABLE `learn` (
+	`ent_seq`	INTEGER,
+	`score`	INTEGER,
+	`lastTry`	TEXT,
+	`nextTry`	TEXT,
+	PRIMARY KEY(ent_seq)
+)</sql><current_tab id="0"/></tab_sql></sqlb_project>

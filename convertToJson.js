@@ -160,6 +160,8 @@ function getMeanings(xml_entry, options){
             if (options && options.removeParentheses)
                 meaning.text = meaning.text.replace(/ *\([^)]*\) */g, " ");
 
+            if(meaning.text.indexOf("to ") === 0) meaning.text = meaning.text.substr(3);
+
             if ( (_.contains(selectedLanguages, meaning.lang) || selectedLanguages == "all") && meaning.text!== "") {
                 meanings.push(meaning);
             }
@@ -168,111 +170,6 @@ function getMeanings(xml_entry, options){
     }
     return meanings;
 }
-
-// function getAllKana(){
-
-//     console.time('getAllKana');
-//     service.kana_array = [];
-
-//     for (var i = 0; i < entries.length; i++) {
-//         var xml_entry = entries[i];
-//         var ent_seq = xml_entry.get('ent_seq').text();
-        
-//         var kannji_block = xml_entry.find('k_ele');
-//         var kana_block = xml_entry.find('r_ele');
-//         for (var j = 0; j < kana_block.length; j++) {
-            
-//             var commonness = calculateCommonness(kana_block[j], 're_pri');
-//             var kanas = kana_block[j].find('reb');
-//             for (var k = 0; k < kanas.length; k++) {
-//                 var attr = kanas[k].attr("lang");
-
-//                 if (_.contains(selectedLanguages, attr ? attr.value() : "eng") || selectedLanguages == "all") {
-
-//                     var word = kanas[k].text();
-//                     // var num_occurences = 0;
-//                     // if(occurenceMap[word]) num_occurences = occurenceMap[word];
-//                     // word = word.replace(/ *\([^)]*\) */g, " ");
-//                     // word = word.trim();
-//                     // word = word.toLowerCase();
-//                     var num_occurences = 0;
-//                     if (kannji_block.length === 0 && k === 0) {
-//                         num_occurences = occurenceMap[word] + commonness;
-//                     }
-                    
-//                     // kanaMap[word] = true;
-//                     service.kana_array.push({text: word, ent_seq: ent_seq, romaji: convertToRomaji(word), commonness:commonness, num_occurences:num_occurences});
-
-//                 }
-//             }
-//         }
-//     }
-
-//     console.timeEnd('getAllKana');
-//     return service.kana_array;
-// }
-
-// function getAllKanji(){
-//     service.kanj_array = [];
-//     // var kanjis = xmlDoc.find('//entry//k_ele//keb');
-//     // var kanjiMap = {};
-//     var entries = xmlDoc.find('//entry');
-//     for (var i = 0; i < entries.length; i++) {
-//         var xml_entry = entries[i];
-//         var ent_seq = xml_entry.get('ent_seq').text();
-//         var kanji_block = xml_entry.find('k_ele');
-//         for (var j = 0; j < kanji_block.length; j++) {
-            
-//             var commonness = calculateCommonness(kanji_block[j], 'ke_pri');
-//             var kanjis = kanji_block[j].find('keb');
-//             for (var k = 0; k < kanjis.length; k++) {
-//                 var word = kanjis[k].text();
-//                 // kanjiMap[word] = {text: kanjiMap[word], ent_seq: ent_seq};
-//                 service.kanj_array.push({text: word, ent_seq: ent_seq, commonness:commonness, num_occurences:occurenceMap[word] || 0});
-//             }
-//         }
-//     }
-//     // service.kanj_array = _.values(kanjiMap);
-//     // service.kanj_array = _.keys(kanjiMap);
-//     return service.kanj_array;
-// }
-
-// function getAllMeanings(options){
-//     console.time('getMeanings');
-//     var allLanguages = {};
-
-//     // if (service.meaning_array) return service.meaning_array;
-
-//     service.meaning_array = [];
-//     var entries = xmlDoc.find('//entry');
-//     for (var i = 0; i < entries.length; i++) {
-//         var xml_entry = entries[i];
-//         var ent_seq = xml_entry.get('ent_seq').text();
-//         var glosses_xml = xml_entry.find('sense//gloss');
-//         for (var j = 0; j < glosses_xml.length; j++) {
-//             var gloss_xml = glosses_xml[j];
-
-//             var lang = gloss_xml.attr("lang");
-//             lang = lang ? lang.value() : "eng";
-
-//             var text = gloss_xml.text();
-
-//             if (options && options.removeParentheses)
-//                 text = text.replace(/ *\([^)]*\) */g, " ").trim();
-
-//             if (_.contains(selectedLanguages, lang) || selectedLanguages == "all") {
-//                 // meanings.push(meaning);
-//                 allLanguages[lang] = true;
-//                 service.meaning_array.push({text: text, lang:lang, ent_seq: ent_seq});
-//             }
-//         }
-//     }
-
-//     service.allLanguages = _.keys(allLanguages);
-//     console.timeEnd('getMeanings');
-//     // service.meaning_array = _.keys(meanings);
-//     return service.meaning_array;
-// }
 
 function getAllLanguages () {
     if (service.allLanguages) {
@@ -417,6 +314,7 @@ function buildDictionary(){
             var text = gloss_xml.text();
             // if (options && options.removeParentheses)
             text = text.replace(/ *\([^)]*\) */g, " ").trim();
+            if(text.indexOf("to ") === 0) text = text.substr(3);
             if (!text) continue;
 
             if (_.contains(selectedLanguages, lang || "eng") || selectedLanguages == "all") {
@@ -424,7 +322,7 @@ function buildDictionary(){
                 var meaning = {text: text, lang:lang, ent_seq: ent_seq};
                 entry.meanings.push(meaning);
             }
-        }        
+        }
 
         // Merge misc into entry
         var senses = xml_entry.find('sense');
