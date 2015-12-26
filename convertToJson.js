@@ -14,10 +14,7 @@ try {
 
 var service = {};
 
-console.time('readFile');
-var jmdict = fs.readFileSync("JMdict");
-// var jmdict = fs.readFileSync("example.xml");
-console.timeEnd('readFile');
+
 
 // var allLanguages = ["ger", "eng", "hun", "spa", "slv", "fre", "dut"];
 var selectedLanguages = config.SelectedLanguages;// ["ger", "eng"];
@@ -35,10 +32,6 @@ var numOccurences = require("./numOccurencesFromExamples");
 var occurenceMap = numOccurences.getMap();
 
 var entities_metadata = require("./entities_metadata");
-
-console.time('parse xml');
-var xmlDoc = libxmljs.parseXml(jmdict);
-console.timeEnd('parse xml');
 
 // var allVocabs = [];
 // all entries
@@ -237,6 +230,61 @@ function getReadingsForKanji (xml_entry, kanji) {
     return readings;
 }
 
+function meaningsPrioSort(a, b) {
+    var prio1 = 100;
+    var prio2 = 100;
+    if (a.text.indexOf("1")>=0) prio1 = 1;
+    if (a.text.indexOf("2")>=0) prio1 = 2;
+    if (a.text.indexOf("3")>=0) prio1 = 3;
+    if (a.text.indexOf("4")>=0) prio1 = 4;
+    if (a.text.indexOf("5")>=0) prio1 = 5;
+
+    if (b.text.indexOf("1")>=0) prio2 = 1;
+    if (b.text.indexOf("2")>=0) prio2 = 2;
+    if (b.text.indexOf("3")>=0) prio2 = 3;
+    if (b.text.indexOf("4")>=0) prio2 = 4;
+    if (b.text.indexOf("5")>=0) prio2 = 5;
+
+    return  prio1 - prio2;
+}
+
+function moveToEnd(str, substr){
+    var pos = str.indexOf(substr);
+    if (pos == -1) return str;
+
+    str = str.replace(substr, "");
+    if (str.indexOf(substr)>=0){ // multiple hits, remove all
+        str.replace(substr, "");
+        str.replace(substr, "");
+    }else{
+        str += " "+substr;
+    }
+    
+    return str.trim();
+}
+
+function processMeanings(meanings) {
+    for (var i = 0; i < meanings.length; i++) {
+        // meaning.text = meaning.text.replace(/ *\([^)]*\) */g, " ").trim();
+        meanings[i].text = meanings[i].text.replace(/ *\([^fnm)]*\) */g, " ").trim();
+        var hits = 0;
+        if (meanings[i].text.indexOf("(f)")>=0) ++hits;
+        if (meanings[i].text.indexOf("(n)")>=0) ++hits;
+        if (meanings[i].text.indexOf("(m)")>=0) ++hits;
+        
+        if (hits >= 2) {
+            // console.log(meanings[i].text);
+            meanings[i].text = meanings[i].text.replace(/ *\([^)]*\) */g, " ").trim(); // remove all (f) (n) (m)
+        }
+
+        meanings[i].text = moveToEnd(meanings[i].text, '(f) ');
+        meanings[i].text = moveToEnd(meanings[i].text, '(n) ');
+        meanings[i].text = moveToEnd(meanings[i].text, '(m) ');
+    }
+}
+
+
+
 
 function isVerbtype (entry) {
     return _.contains(allVerbTypes, entry);
@@ -246,6 +294,15 @@ var allMisc = {};
 
 function buildDictionary(){
     console.time('Build Dictionary');
+
+    console.time('readFile');
+    var jmdict = fs.readFileSync("JMdict");
+    // var jmdict = fs.readFileSync("example.xml");
+    console.timeEnd('readFile');
+    console.time('parse xml');
+    var xmlDoc = libxmljs.parseXml(jmdict);
+    console.timeEnd('parse xml');
+
     var json_entries = [];
     var allLanguages = {};
     // all entries
@@ -276,7 +333,8 @@ function buildDictionary(){
             var kanjis = kanji_block[j].find('keb');
             for (k = 0; k < kanjis.length; k++) {
                 word = kanjis[k].text();
-                num_occurences = occurenceMap[word] + commonness;
+                var numOccurences = occurenceMap[word] || 0;
+                num_occurences = numOccurences + commonness;
                 // kanjiMap[word] = {text: kanjiMap[word], ent_seq: ent_seq};
                 var kanji = {text: word, ent_seq: ent_seq, commonness:commonness, num_occurences:num_occurences};
                 kanji.readings = getReadingsForKanji(xml_entry, kanji.text);
@@ -297,10 +355,6 @@ function buildDictionary(){
                     num_occurences = occurenceMap[word] + commonness;
                 }
                 var kana = {text: word, ent_seq: ent_seq, romaji: convertToRomaji(word), commonness:commonness, num_occurences:num_occurences};
-                if (ent_seq === 1011920){
-                    console.log(kana.text);
-                    console.log(kana.romaji);
-                }
                 entry.kana.push(kana);
             }
         }
@@ -312,8 +366,11 @@ function buildDictionary(){
 
             var lang = gloss_xml.attr("lang") ? gloss_xml.attr("lang").value() : "eng";
             var text = gloss_xml.text();
+
+            
+
             // if (options && options.removeParentheses)
-            text = text.replace(/ *\([^)]*\) */g, " ").trim();
+            // text = text.replace(/ *\([^)]*\) */g, " ").trim();
             if(text.indexOf("to ") === 0) text = text.substr(3);
             if (!text) continue;
 
@@ -323,6 +380,13 @@ function buildDictionary(){
                 entry.meanings.push(meaning);
             }
         }
+
+        entry.meanings.sort(meaningsPrioSort);
+        processMeanings(entry.meanings);
+        // if(ent_seq === '1262530'){
+        //     console.log(entry.meanings);
+        // }
+
 
         // Merge misc into entry
         var senses = xml_entry.find('sense');
@@ -361,7 +425,6 @@ function buildDictionary(){
 }
 
 buildDictionary();
-
 
 // Pretty Print
 // fs.writeFileSync("jmdict.json", JSON.stringify(service.json_entries, null, 2), 'utf8');

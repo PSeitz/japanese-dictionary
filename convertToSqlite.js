@@ -5,6 +5,7 @@ var _ = require('lodash');
 var sqlite3 = require('sqlite3');
 
 var data = require("./convertToJson");
+var wordfreq = require("./wordfreq");
 
 var db = new sqlite3.Database('jmdict.sqlite');
 db.serialize(function() {
@@ -43,6 +44,21 @@ db.serialize(function() {
     // db.run("CREATE TABLE entries (_id INTEGER PRIMARY KEY, ent_seq INTEGER, meaning lang, kanji  FOREIGN KEY(trackartist) REFERENCES artist(artistid))");
     db.run("CREATE TABLE meanings (_id INTEGER PRIMARY KEY, meaning TEXT collate nocase, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id) )");
 
+    console.log("indices");
+    db.run("CREATE INDEX kana_index ON kanas(kana)");
+    db.run("CREATE INDEX kanji_index ON kanjis(kanji)");
+    db.run("CREATE INDEX meaning_index ON meanings(meaning)");
+
+    db.run("CREATE INDEX kana_ent_seqs ON kanas(ent_seq)");
+    db.run("CREATE INDEX kanji_ent_seqs ON kanjis(ent_seq)");
+    db.run("CREATE INDEX meaning_ent_seqs ON meanings(ent_seq)");
+    db.run("CREATE INDEX misc_ent_seqs ON entry_misc(ent_seq)");
+
+    db.run("CREATE INDEX kanji_readings_ix ON kanji_readings(kanji_id)");
+
+    db.run("CREATE INDEX kana_conjugations_ix ON kana_conjugations(form)");
+    db.run("CREATE INDEX kanji_conjugations_ix ON kanji_conjugations(form)");
+
     console.time('Db inserts');
 
     console.log("kanjis");
@@ -69,15 +85,6 @@ db.serialize(function() {
     });
 
     
-    console.log("indices");
-    db.run("CREATE INDEX kana_index ON kanas(kana)");
-    db.run("CREATE INDEX kanji_index ON kanjis(kanji)");
-    db.run("CREATE INDEX meaning_index ON meanings(meaning)");
-
-    db.run("CREATE INDEX kana_ent_seqs ON kanas(ent_seq)");
-    db.run("CREATE INDEX kanji_ent_seqs ON kanjis(ent_seq)");
-    db.run("CREATE INDEX meaning_ent_seqs ON meanings(ent_seq)");
-    db.run("CREATE INDEX misc_ent_seqs ON entry_misc(ent_seq)");
 
     console.log("kanji_conjugations");
     insert(db, {
@@ -127,25 +134,6 @@ db.serialize(function() {
 
 
 
-    // insert(db, {
-    //     table: "kanji_readings",
-    //     tablefields: ["_id", "kanji_id", "kana_id"],
-    //     data: data.getKanjiReadings(),
-    //     properties: ["kanji", "reading"],
-    //     fk: {
-    //         "kanji": {
-    //             table: "kanjis",
-    //             field: "_id",
-    //             values: ["ent_seq", "kanji"]
-    //         },
-    //         "reading": {
-    //             table: "kanas",
-    //             field: "_id",
-    //             values: ["ent_seq", "reading"]
-    //         }
-    //     }
-    // });
-
     console.log("readings");
     var tablefields =  ["_id", "kanji_id", "kana_id"];
     var readings = data.getKanjiReadings();
@@ -160,14 +148,10 @@ db.serialize(function() {
         db.run(query);
         
     }
-    
     db.run("END");
-    
-    console.log("more_indices");
-    db.run("CREATE INDEX kanji_readings_ix ON kanji_readings(kanji_id)");
 
-    db.run("CREATE INDEX kana_conjugations_ix ON kana_conjugations(form)");
-    db.run("CREATE INDEX kanji_conjugations_ix ON kanji_conjugations(form)");
+
+    wordfreq.addWordFreqToKanji(db);
 
     console.timeEnd('Db inserts');
 
@@ -227,3 +211,4 @@ function insert(db, options){
 }
 
 db.close();
+

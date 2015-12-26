@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/Users/d056831/Development/japanese-dictionary/jmdict.sqlite"/><window><current_tab id="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1039"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="entry_misc"/><column_widths data="AAAABAAAAAgAbQBpAHMAYwAAAAEAAAACAAABLgAAAAwAawBhAG4AagBpAHMAAAABAAAAAgAAAGQAAAAUAGUAbgB0AHIAeQBfAG0AaQBzAGMAAAABAAAAAgAAAGQAAAAgAGEAbgBkAHIAbwBpAGQAXwBtAGUAdABhAGQAYQB0AGEAAAABAAAAAAAAAAA="/><sort column="0" order="0"/></tab_browse><tab_sql><sql name="SQL 1">SELECT * from kanjis
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="C:/Development/japanese-dictionary/jmdict.sqlite"/><window><current_tab id="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="906"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="kanjis"/><column_widths data="AAAACAAAAAgAbQBpAHMAYwAAAAEAAAACAAABLgAAACgAbQBlAGEAbgBpAG4AZwBzAF8AcwB1AGcAZwBlAHMAdABpAG8AbgBzAAAAAQAAAAEAAABkAAAAHABtAGUAYQBuAGkAbgBnAHMAXwBpAG4AZABlAHgAAAABAAAAAQAAAdsAAAAYAG0AZQBhAG4AaQBuAGcAcwBfAGYAdABzAAAAAQAAAAEAAABkAAAAEABtAGUAYQBuAGkAbgBnAHMAAAABAAAAAgAAAaYAAAAMAGsAYQBuAGoAaQBzAAAAAQAAAAIAAABkAAAAFABlAG4AdAByAHkAXwBtAGkAcwBjAAAAAQAAAAIAAABkAAAAIABhAG4AZAByAG8AaQBkAF8AbQBlAHQAYQBkAGEAdABhAAAAAQAAAAAAAAAA"/><sort column="0" order="0"/></tab_browse><tab_sql><sql name="SQL 1">SELECT * from kanjis
 WHERE ent_seq IN( SELECT ent_seq FROM meanings WHERE meaning LIKE &quot;%ankommen&quot; )
 ORDER BY num_occurences DESC;
 
@@ -11,16 +11,28 @@ SELECT * FROM meanings_fts WHERE meaning MATCH &quot;Gerüst&quot;
 SELECT matchinfo(meanings_fts),snippet(meanings_fts),offsets(meanings_fts), meaning, ent_seq FROM meanings_fts WHERE meaning MATCH &quot;Gerüst&quot;
 
 SELECT matchinfo(meanings_fts), meaning, ent_seq FROM meanings_fts WHERE meaning MATCH &quot;test&quot;
-SELECT offsets(meanings_fts), meaning, ent_seq FROM meanings_fts WHERE meaning MATCH &quot;test&quot;
+SELECT offsets(meanings_fts), meaning FROM meanings_fts WHERE meaning MATCH &quot;test&quot;
 
 SELECT * FROM meanings WHERE meaning LIKE &quot;%Gerüst%&quot;
 
-CREATE VIRTUAL TABLE meanings_fts USING fts3(_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, ent_seq INTEGER, FOREIGN KEY(lang) REFERENCES languages(_id));
+DROP TABLE meanings_fts;
+CREATE VIRTUAL TABLE meanings_fts USING fts4(_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, freq Integer);
 
 
-INSERT INTO meanings_fts (_id, meaning, lang, ent_seq )
-SELECT * FROM meanings;
+SELECT _id, meaning, lang FROM meanings
+GROUP BY meaning, lang;
+JOIN meanings.meaning 
 
+
+SELECT _id, meaning, lang FROM meanings_fts
+ORDER BY length(meaning) DESC
+
+SELECT _id, meaning, lang FROM meanings_fts
+WHERE length(meaning) &gt; 26
+ORDER BY length(meaning) ASC
+
+DELETE FROM meanings_fts
+WHERE length(meaning) &gt; 26
 
 INSERT INTO meanings_fts(_id, meaning, lang, ent_seq ) VALUES(10, 'test', 1, 10);
 
@@ -38,4 +50,49 @@ SELECT COUNT(*)
 FROM
 
 Select misc FROM  misc m 
-JOIN (Select misc_id from entry_misc WHERE ent_seq = '1001500' ) a ON a.misc_id = m._id</sql><current_tab id="0"/></tab_sql></sqlb_project>
+JOIN (Select misc_id from entry_misc WHERE ent_seq = '1001500' ) a ON a.misc_id = m._id
+
+
+
+UPDATE kanjis SET num_occurences = num_occurences+1 WHERE kanji  = '仝'
+
+
+SELECT _id,  meaning, count(meaning) as cnt FROM meanings WHERE meaning LIKE 'ka%'
+group by meaning Order by cnt desc  LIMIT 10;
+
+DROP TABLE meanings_index;
+CREATE VIRTUAL TABLE meanings_index USING fts4(meaning, tokenize=porter);
+INSERT INTO meanings_index SELECT meaning from meanings;
+
+SELECT meaning, count(meaning) as cnt 
+FROM meanings_index 
+WHERE meaning match 'k*'
+group by meaning Order by cnt desc LIMIT 10;
+
+
+</sql><sql name="SQL 3">DROP TABLE meanings_suggestions;
+CREATE  TABLE meanings_suggestions (_id INTEGER PRIMARY KEY, meaning TEXT, lang INTEGER, freq Integer);
+CREATE INDEX meanings_suggestions_ix ON meanings_suggestions(meaning, lang)
+
+SELECT meaning, lang FROM meanings_suggestions WHERE meaning LIKE &quot;a%&quot;
+ORDER BY freq
+LIMIT 10;
+
+
+INSERT INTO meanings_suggestions
+SELECT mean._id, mean.meaning, mean.lang, freq.freq FROM meanings AS mean JOIN germ_freq
+AS freq ON mean.meaning=freq.text 
+WHERE lang = 1
+GROUP BY meaning, lang;</sql><sql name="SQL 4">SELECT COUNT (*) FROM kanjis
+
+SELECT COUNT (*) FROM kanjis
+WHERE num_occurences != 0
+
+
+CREATE INDEX nu on kanjis(num_occurences)
+
+SELECT COUNT (*) FROM kanjis
+WHERE num_occurences &gt; (SELECT MAX(num_occurences) FROM kanjis WHERE ent_seq = 1580555)
+
+
+1023.0/58752.0</sql><current_tab id="2"/></tab_sql></sqlb_project>
