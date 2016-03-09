@@ -26,10 +26,13 @@ db.serialize(function() {
     db.run("DROP TABLE IF EXISTS kanji_readings");
     db.run("DROP TABLE IF EXISTS misc");
     db.run("DROP TABLE IF EXISTS entry_misc");
+    db.run("DROP TABLE IF EXISTS entry_pos");
 
     db.run("CREATE TABLE languages (_id INTEGER PRIMARY KEY, lang TEXT NOT NULL UNIQUE collate nocase)");
 
     db.run("CREATE TABLE entry_misc (_id INTEGER PRIMARY KEY, ent_seq INTEGER NOT NULL, misc_id INTEGER NOT NULL)");
+
+    db.run("CREATE TABLE entry_pos (_id INTEGER PRIMARY KEY, ent_seq INTEGER NOT NULL, pos TEXT NOT NULL)");
 
     db.run("CREATE TABLE misc (_id INTEGER PRIMARY KEY, misc TEXT NOT NULL)");
 
@@ -53,6 +56,7 @@ db.serialize(function() {
     db.run("CREATE INDEX kanji_ent_seqs ON kanjis(ent_seq)");
     db.run("CREATE INDEX meaning_ent_seqs ON meanings(ent_seq)");
     db.run("CREATE INDEX misc_ent_seqs ON entry_misc(ent_seq)");
+    db.run("CREATE INDEX pos_ent_seqs ON entry_pos(ent_seq)");
 
     db.run("CREATE INDEX kanji_readings_ix ON kanji_readings(kanji_id)");
 
@@ -132,6 +136,15 @@ db.serialize(function() {
         }
     });
 
+
+    console.log("pos");
+    insert(db, {
+        // log: true,
+        table: "entry_pos",
+        tablefields: ["_id", "ent_seq", "pos"],
+        data: data.getAllPosWithEntSeq(),
+        properties: ["ent_seq", "pos"]
+    });
 
 
     console.log("readings");
