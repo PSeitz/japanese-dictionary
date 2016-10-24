@@ -155,7 +155,7 @@ function getMeanings(xml_entry, options){
 
             if(meaning.text.indexOf("to ") === 0) meaning.text = meaning.text.substr(3);
 
-            if ( (_.contains(selectedLanguages, meaning.lang) || selectedLanguages == "all") && meaning.text!== "") {
+            if ( (_.includes(selectedLanguages, meaning.lang) || selectedLanguages == "all") && meaning.text!== "") {
                 meanings.push(meaning);
             }
             
@@ -287,7 +287,7 @@ function processMeanings(meanings) {
 
 
 function isVerbtype (entry) {
-    return _.contains(allVerbTypes, entry);
+    return _.includes(allVerbTypes, entry);
 }
 
 var allMisc = {};
@@ -301,7 +301,7 @@ function buildDictionary(){
     console.timeEnd('readFile');
     console.time('parse xml');
     var xmlDoc = libxmljs.parseXml(jmdict);
-    console.timeEnd('parse xml');
+    console.timeEnd('parse xml'); 
 
     var json_entries = [];
     var allLanguages = {};
@@ -375,7 +375,7 @@ function buildDictionary(){
             if(text.indexOf("to ") === 0) text = text.substr(3);
             if (!text) continue;
 
-            if (_.contains(selectedLanguages, lang || "eng") || selectedLanguages == "all") {
+            if (_.includes(selectedLanguages, lang || "eng") || selectedLanguages == "all") {
                 allLanguages[lang] = true;
                 var meaning = {text: text, lang:lang, ent_seq: ent_seq};
                 entry.meanings.push(meaning);
@@ -405,7 +405,7 @@ function buildDictionary(){
             allMisc[entry.misc[p]] = true;
         }
 
-        if (_.contains(entry.misc, "word usually written using kana alone")) entry.useKana = true;
+        if (_.includes(entry.misc, "word usually written using kana alone")) entry.useKana = true;
 
         var posArgs = positionalArguments (xml_entry, {shortVersion:true});
         entry.pos = posArgs;
@@ -417,7 +417,7 @@ function buildDictionary(){
 
     console.log(json_entries.length);
     json_entries = _.filter(json_entries, function(entry) {
-        return !_.contains(entry.misc, "archaism"); // "filter archaic words"
+        return !_.includes(entry.misc, "archaism"); // "filter archaic words"
     });
     console.log(json_entries.length);
     console.timeEnd('Build Dictionary');
@@ -429,7 +429,7 @@ function buildDictionary(){
 buildDictionary();
 
 // Pretty Print
-// fs.writeFileSync("jmdict.json", JSON.stringify(service.json_entries, null, 2), 'utf8');
+fs.writeFileSync("jmdict.json", JSON.stringify(service.json_entries, null, 2), 'utf8');
 // fs.writeFileSync("jmdict.json", JSON.stringify(service.json_entries), 'utf8');
 
 
