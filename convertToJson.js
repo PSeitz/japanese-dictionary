@@ -44,13 +44,9 @@ function calculateCommonness(node, commonnessSelector){
     if (!flags_xml) {
         return 0;
     }
-    var flags = _.map(flags_xml, function(value){
-        return value.text();
-    });
+    var flags = _.map(flags_xml, value => value.text());
 
-    var value = _.sum(flags, function(flag) {
-        return config.Commonness[flag];
-    });
+    var value = _.sum(flags.map(flag => config.Commonness[flag]));
 
     var nff_flag = _.find(flags, function(flag) {
         return flag.indexOf("nf") >= 0;
@@ -334,6 +330,7 @@ function buildDictionary(){
             var kanjis = kanji_block[j].find('keb');
             for (k = 0; k < kanjis.length; k++) {
                 word = kanjis[k].text();
+                if (word == "我慢") console.log("我慢: " + commonness)
                 var numOccurences = occurenceMap[word] || 0;
                 num_occurences = numOccurences + commonness;
                 // kanjiMap[word] = {text: kanjiMap[word], ent_seq: ent_seq};
@@ -410,7 +407,7 @@ function buildDictionary(){
         var posArgs = positionalArguments (xml_entry, {shortVersion:true});
         entry.pos = posArgs;
         var verbTypes = _.filter(posArgs, isVerbtype);
-        addConjugations(verbTypes, entry);
+        // addConjugations(verbTypes, entry);
         json_entries.push(entry);
 
     }
