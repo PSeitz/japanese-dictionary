@@ -229,17 +229,17 @@ function getReadingsForKanji (xml_entry, kanji) {
 function meaningsPrioSort(a, b) {
     var prio1 = 100;
     var prio2 = 100;
-    if (a.text.indexOf("1")>=0) prio1 = 1;
-    if (a.text.indexOf("2")>=0) prio1 = 2;
-    if (a.text.indexOf("3")>=0) prio1 = 3;
-    if (a.text.indexOf("4")>=0) prio1 = 4;
-    if (a.text.indexOf("5")>=0) prio1 = 5;
+    if (a.indexOf("1")>=0) prio1 = 1;
+    if (a.indexOf("2")>=0) prio1 = 2;
+    if (a.indexOf("3")>=0) prio1 = 3;
+    if (a.indexOf("4")>=0) prio1 = 4;
+    if (a.indexOf("5")>=0) prio1 = 5;
 
-    if (b.text.indexOf("1")>=0) prio2 = 1;
-    if (b.text.indexOf("2")>=0) prio2 = 2;
-    if (b.text.indexOf("3")>=0) prio2 = 3;
-    if (b.text.indexOf("4")>=0) prio2 = 4;
-    if (b.text.indexOf("5")>=0) prio2 = 5;
+    if (b.indexOf("1")>=0) prio2 = 1;
+    if (b.indexOf("2")>=0) prio2 = 2;
+    if (b.indexOf("3")>=0) prio2 = 3;
+    if (b.indexOf("4")>=0) prio2 = 4;
+    if (b.indexOf("5")>=0) prio2 = 5;
 
     return  prio1 - prio2;
 }
@@ -262,20 +262,20 @@ function moveToEnd(str, substr){
 function processMeanings(meanings) {
     for (var i = 0; i < meanings.length; i++) {
         // meaning.text = meaning.text.replace(/ *\([^)]*\) */g, " ").trim();
-        meanings[i].text = meanings[i].text.replace(/ *\([^fnm)]*\) */g, " ").trim();
+        meanings[i].text = meanings[i].replace(/ *\([^fnm)]*\) */g, " ").trim();
         var hits = 0;
-        if (meanings[i].text.indexOf("(f)")>=0) ++hits;
-        if (meanings[i].text.indexOf("(n)")>=0) ++hits;
-        if (meanings[i].text.indexOf("(m)")>=0) ++hits;
+        if (meanings[i].indexOf("(f)")>=0) ++hits;
+        if (meanings[i].indexOf("(n)")>=0) ++hits;
+        if (meanings[i].indexOf("(m)")>=0) ++hits;
         
         if (hits >= 2) {
-            // console.log(meanings[i].text);
-            meanings[i].text = meanings[i].text.replace(/ *\([^)]*\) */g, " ").trim(); // remove all (f) (n) (m)
+            // console.log(meanings[i]);
+            meanings[i] = meanings[i].replace(/ *\([^)]*\) */g, " ").trim(); // remove all (f) (n) (m)
         }
 
-        meanings[i].text = moveToEnd(meanings[i].text, '(f) ');
-        meanings[i].text = moveToEnd(meanings[i].text, '(n) ');
-        meanings[i].text = moveToEnd(meanings[i].text, '(m) ');
+        meanings[i] = moveToEnd(meanings[i], '(f) ');
+        meanings[i] = moveToEnd(meanings[i], '(n) ');
+        meanings[i] = moveToEnd(meanings[i], '(m) ');
     }
 }
 
@@ -312,9 +312,9 @@ function buildDictionary(){
             misc:[],
             kanji:[], // {text: blub, commonness: 10} 
             kana:[], // {text: blub, commonness: 10, romaji: }    
-            meanings:[
-                //lang: ger, text: blubber, type: noun, etc.
-            ]
+            meanings:{
+                //ger:[blubber] // type: noun, etc. ??
+            }
         };
         entry.ent_seq = ent_seq;
         // entry.kanji = getKanjiKana(xml_entry, 'k_ele', 'keb', 'ke_pri'); // kanji
@@ -332,7 +332,7 @@ function buildDictionary(){
                 word = kanjis[k].text();
                 if (word == "我慢") console.log("我慢: " + commonness)
                 var numOccurences = occurenceMap[word] || 0;
-                num_occurences = numOccurences + commonness;
+                commonness += numOccurences
                 // kanjiMap[word] = {text: kanjiMap[word], ent_seq: ent_seq};
                 var kanji = {text: word, ent_seq: ent_seq, commonness:commonness, num_occurences:num_occurences};
                 kanji.readings = getReadingsForKanji(xml_entry, kanji.text);
@@ -350,7 +350,8 @@ function buildDictionary(){
                 word = kanas[k].text();
                 num_occurences = 0;
                 if (kanji_block.length === 0 && j === 0) {
-                    num_occurences = occurenceMap[word] + commonness;
+                    num_occurences = occurenceMap[word];
+                    commonness += num_occurences
                 }
                 var kana = {text: word, ent_seq: ent_seq, romaji: convertToRomaji(word), commonness:commonness, num_occurences:num_occurences};
                 entry.kana.push(kana);
@@ -374,13 +375,22 @@ function buildDictionary(){
 
             if (_.includes(selectedLanguages, lang || "eng") || selectedLanguages == "all") {
                 allLanguages[lang] = true;
-                var meaning = {text: text, lang:lang, ent_seq: ent_seq};
-                entry.meanings.push(meaning);
+                // var meaning = {text: text, lang:lang, ent_seq: ent_seq};
+                // entry.meanings.push(meaning);
+                entry.meanings[lang] = entry.meanings[lang] || []
+                entry.meanings[lang].push(text);
             }
         }
 
-        entry.meanings.sort(meaningsPrioSort);
-        processMeanings(entry.meanings);
+        if(entry.meanings.ger){
+            entry.meanings.ger.sort(meaningsPrioSort);
+            processMeanings(entry.meanings.ger);
+        }
+        if(entry.meanings.eng){
+            entry.meanings.eng.sort(meaningsPrioSort);
+            processMeanings(entry.meanings.eng);
+        }
+        
         // if(ent_seq === '1262530'){
         //     console.log(entry.meanings);
         // }
