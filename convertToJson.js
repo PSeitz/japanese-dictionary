@@ -321,7 +321,7 @@ function buildDictionary(){
         // entry.kana = getKanjiKana(xml_entry, 'r_ele', 'reb', 're_pri', true); //  kana/reading
         // entry.meanings = getMeanings(xml_entry);
         var j,k, commonness, word, num_occurences;
-
+        let commonnessSum = 0
         
         // Kanji
         var kanji_block = xml_entry.find('k_ele');
@@ -334,8 +334,9 @@ function buildDictionary(){
                 var numOccurences = occurenceMap[word] || 0;
                 commonness += numOccurences
                 // kanjiMap[word] = {text: kanjiMap[word], ent_seq: ent_seq};
-                var kanji = {text: word, ent_seq: ent_seq, commonness:commonness, num_occurences:num_occurences};
+                var kanji = {text: word, ent_seq: ent_seq, commonness:commonness};
                 kanji.readings = getReadingsForKanji(xml_entry, kanji.text);
+                commonnessSum+=commonness
                 // console.log(kanji.readings);
                 entry.kanji.push(kanji);
             }
@@ -353,7 +354,8 @@ function buildDictionary(){
                     num_occurences = occurenceMap[word];
                     commonness += num_occurences
                 }
-                var kana = {text: word, ent_seq: ent_seq, romaji: convertToRomaji(word), commonness:commonness, num_occurences:num_occurences};
+                commonnessSum+=commonness
+                var kana = {text: word, ent_seq: ent_seq, romaji: convertToRomaji(word), commonness:commonness};
                 entry.kana.push(kana);
             }
         }
@@ -366,8 +368,6 @@ function buildDictionary(){
             var lang = gloss_xml.attr("lang") ? gloss_xml.attr("lang").value() : "eng";
             var text = gloss_xml.text();
 
-            
-
             // if (options && options.removeParentheses)
             // text = text.replace(/ *\([^)]*\) */g, " ").trim();
             if(text.indexOf("to ") === 0) text = text.substr(3);
@@ -378,7 +378,7 @@ function buildDictionary(){
                 // var meaning = {text: text, lang:lang, ent_seq: ent_seq};
                 // entry.meanings.push(meaning);
                 entry.meanings[lang] = entry.meanings[lang] || []
-                entry.meanings[lang].push(text);
+                if (entry.meanings[lang].indexOf(text) === -1) entry.meanings[lang].push(text);
             }
         }
 
@@ -417,7 +417,10 @@ function buildDictionary(){
         var posArgs = positionalArguments (xml_entry, {shortVersion:true});
         entry.pos = posArgs;
         var verbTypes = _.filter(posArgs, isVerbtype);
-        // addConjugations(verbTypes, entry);
+        addConjugations(verbTypes, entry);
+
+        entry.commonness = commonnessSum || 0
+
         json_entries.push(entry);
 
     }
