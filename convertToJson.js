@@ -226,20 +226,20 @@ function getReadingsForKanji (xml_entry, kanji) {
     return readings;
 }
 
+function getDePosition(a){
+    if (a.indexOf("1")>=0) return 1;
+    if (a.indexOf("2")>=0) return 2;
+    if (a.indexOf("3")>=0) return 3;
+    if (a.indexOf("4")>=0) return 4;
+    if (a.indexOf("5")>=0) return 5;
+    if (a.indexOf("6")>=0) return 6;
+}
+
 function meaningsPrioSort(a, b) {
     var prio1 = 100;
     var prio2 = 100;
-    if (a.indexOf("1")>=0) prio1 = 1;
-    if (a.indexOf("2")>=0) prio1 = 2;
-    if (a.indexOf("3")>=0) prio1 = 3;
-    if (a.indexOf("4")>=0) prio1 = 4;
-    if (a.indexOf("5")>=0) prio1 = 5;
-
-    if (b.indexOf("1")>=0) prio2 = 1;
-    if (b.indexOf("2")>=0) prio2 = 2;
-    if (b.indexOf("3")>=0) prio2 = 3;
-    if (b.indexOf("4")>=0) prio2 = 4;
-    if (b.indexOf("5")>=0) prio2 = 5;
+    if (getDePosition(a)) prio1 = getDePosition(a);
+    if (getDePosition(b)) prio2 = getDePosition(a);
 
     return  prio1 - prio2;
 }
@@ -259,27 +259,25 @@ function moveToEnd(str, substr){
     return str.trim();
 }
 
-function processMeanings(meanings) {
+function processMeanings(meanings) { /// WHAT????
     for (var i = 0; i < meanings.length; i++) {
         // meaning.text = meaning.text.replace(/ *\([^)]*\) */g, " ").trim();
-        meanings[i].text = meanings[i].replace(/ *\([^fnm)]*\) */g, " ").trim();
+        meanings[i].text = meanings[i].text.replace(/ *\([^fnm)]*\) */g, " ").trim();
         var hits = 0;
-        if (meanings[i].indexOf("(f)")>=0) ++hits;
-        if (meanings[i].indexOf("(n)")>=0) ++hits;
-        if (meanings[i].indexOf("(m)")>=0) ++hits;
-        
+        if (meanings[i].text.indexOf("(f)")>=0) ++hits;
+        if (meanings[i].text.indexOf("(n)")>=0) ++hits;
+        if (meanings[i].text.indexOf("(m)")>=0) ++hits;
+
         if (hits >= 2) {
-            // console.log(meanings[i]);
-            meanings[i] = meanings[i].replace(/ *\([^)]*\) */g, " ").trim(); // remove all (f) (n) (m)
+            // console.log(meanings[i].text);
+            meanings[i].text = meanings[i].text.replace(/ *\([^)]*\) */g, " ").trim(); // remove all (f) (n) (m)
         }
 
-        meanings[i] = moveToEnd(meanings[i], '(f) ');
-        meanings[i] = moveToEnd(meanings[i], '(n) ');
-        meanings[i] = moveToEnd(meanings[i], '(m) ');
+        meanings[i].text = moveToEnd(meanings[i].text, '(f) ');
+        meanings[i].text = moveToEnd(meanings[i].text, '(n) ');
+        meanings[i].text = moveToEnd(meanings[i].text, '(m) ');
     }
 }
-
-
 
 
 function isVerbtype (entry) {
@@ -378,18 +376,24 @@ function buildDictionary(){
                 // var meaning = {text: text, lang:lang, ent_seq: ent_seq};
                 // entry.meanings.push(meaning);
                 entry.meanings[lang] = entry.meanings[lang] || []
-                if (entry.meanings[lang].indexOf(text) === -1) entry.meanings[lang].push(text);
+                if (lang === 'ger') {
+                    let deMeaning = {text:text}
+                    if(getDePosition(text)) deMeaning.rank = getDePosition(text)
+                    if (entry.meanings[lang].map(el => el.text).indexOf(text) === -1) entry.meanings[lang].push(deMeaning);
+                }else{
+                    if (entry.meanings[lang].indexOf(text) === -1) entry.meanings[lang].push(text);
+                }
             }
         }
 
         if(entry.meanings.ger){
-            entry.meanings.ger.sort(meaningsPrioSort);
+            // entry.meanings.ger.sort(meaningsPrioSort);
             processMeanings(entry.meanings.ger);
         }
-        if(entry.meanings.eng){
-            entry.meanings.eng.sort(meaningsPrioSort);
-            processMeanings(entry.meanings.eng);
-        }
+        // if(entry.meanings.eng){
+        //     entry.meanings.eng.sort(meaningsPrioSort);
+        //     processMeanings(entry.meanings.eng);
+        // }
         
         // if(ent_seq === '1262530'){
         //     console.log(entry.meanings);
