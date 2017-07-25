@@ -154,11 +154,40 @@ function getMeanings(xml_entry, options){
             if ( (_.includes(selectedLanguages, meaning.lang) || selectedLanguages == "all") && meaning.text!== "") {
                 meanings.push(meaning);
             }
-            
         }
     }
     return meanings;
 }
+
+
+function normalize_text(text) {
+    // text = text.replace(/ *\([^)]*\) */g, " ");
+    text = text.replace(/\([fmn\d]\)/g, " ");
+    text = text.replace(/[\(\)]/g, " ");
+    text = text.replace(/"\[{}'"“/g, "");
+    text = text.replace(/\s\s+/g, " ");
+    if(text.indexOf("to ") === 0) text = text.substr(3);
+    if(text.indexOf("der ") === 0) text = text.substr(4);
+    if(text.indexOf("die ") === 0) text = text.substr(4);
+    if(text.indexOf("das ") === 0) text = text.substr(4);
+    return text.toLowerCase().trim();
+
+    //         (Regex::new(r"\([fmn\d]\)").unwrap(), " "),
+    //         (Regex::new(r"[\(\)]").unwrap(), " "),  // remove braces
+    //         (Regex::new(r#"[{}'"“]"#).unwrap(), ""), // remove ' " {}
+    //         (Regex::new(r"\s\s+").unwrap(), " "), // replace tabs, newlines, double spaces with single spaces
+    //         (Regex::new(r"[,.…;・’-]").unwrap(), "")  // remove , .;・’-
+    // let mut new_str = text.to_owned();
+    // for ref tupl in &*REGEXES {
+    //     new_str = (tupl.0).replace_all(&new_str, tupl.1).into_owned();
+    // }
+
+    // new_str.to_lowercase().trim().to_owned()
+
+}
+
+
+
 
 function getAllLanguages () {
     if (service.allLanguages) {
@@ -286,6 +315,12 @@ function isVerbtype (entry) {
 
 var allMisc = {};
 
+let deu_wordfreq = JSON.parse(fs.readFileSync('deu_wordfreq.json'))
+let eng_wordfreq = JSON.parse(fs.readFileSync('eng_wordfreq.json'))
+
+let deWords = {}
+let engWords = {}
+
 function buildDictionary(){
     console.time('Build Dictionary');
 
@@ -358,6 +393,8 @@ function buildDictionary(){
             }
         }
 
+        
+
         // meaning
         var glosses_xml = xml_entry.find('sense//gloss');
         for (j = 0; j < glosses_xml.length; j++) {
@@ -375,13 +412,17 @@ function buildDictionary(){
                 allLanguages[lang] = true;
                 // var meaning = {text: text, lang:lang, ent_seq: ent_seq};
                 // entry.meanings.push(meaning);
+                let normalized_text = normalize_text(text)
                 entry.meanings[lang] = entry.meanings[lang] || []
                 if (lang === 'ger') {
                     let deMeaning = {text:text}
                     if(getDePosition(text)) deMeaning.rank = getDePosition(text)
                     if (entry.meanings[lang].map(el => el.text).indexOf(text) === -1) entry.meanings[lang].push(deMeaning);
+
+                    deWords[normalized_text] = deu_wordfreq[normalized_text] || 0
                 }else{
-                    if (entry.meanings[lang].indexOf(text) === -1) entry.meanings[lang].push(text);
+                    if(entry.meanings[lang].indexOf(text) === -1) entry.meanings[lang].push(text);
+                    engWords[normalized_text] = eng_wordfreq[normalized_text] || 0
                 }
             }
         }
@@ -444,8 +485,17 @@ buildDictionary();
 
 // Pretty Print
 fs.writeFileSync("jmdict.json", JSON.stringify(service.json_entries, null, 2), 'utf8');
+fs.writeFileSync("deWords.json", JSON.stringify(key_value_to_array(deWords), null, 2));
+fs.writeFileSync("engWords.json", JSON.stringify(key_value_to_array(engWords), null, 2));
 // fs.writeFileSync("jmdict.json", JSON.stringify(service.json_entries), 'utf8');
 
+
+function key_value_to_array(entries) {
+    return Object.keys(entries).map(text => {
+        if (entries[text] !== 0) return {text:text, commonness:entries[text]}
+        return {text:text}
+    })
+}
 
 
 function getKanjiReadings(){
