@@ -319,7 +319,7 @@ let deu_wordfreq = JSON.parse(fs.readFileSync('deu_wordfreq.json'))
 let eng_wordfreq = JSON.parse(fs.readFileSync('eng_wordfreq.json'))
 
 let deWords = {}
-let engWords = {}
+let enWords = {}
 
 function buildDictionary(){
     console.time('Build Dictionary');
@@ -419,10 +419,13 @@ function buildDictionary(){
                     if(getDePosition(text)) deMeaning.rank = getDePosition(text)
                     if (entry.meanings[lang].map(el => el.text).indexOf(text) === -1) entry.meanings[lang].push(deMeaning);
 
-                    deWords[normalized_text] = deu_wordfreq[normalized_text] || 0
+                    if(deu_wordfreq[normalized_text])
+                        deWords[normalized_text] = deu_wordfreq[normalized_text] || 0
                 }else{
                     if(entry.meanings[lang].indexOf(text) === -1) entry.meanings[lang].push(text);
-                    engWords[normalized_text] = eng_wordfreq[normalized_text] || 0
+
+                    if (eng_wordfreq[normalized_text])
+                        enWords[normalized_text] = eng_wordfreq[normalized_text] || 0
                 }
             }
         }
@@ -486,13 +489,13 @@ buildDictionary();
 // Pretty Print
 fs.writeFileSync("jmdict.json", JSON.stringify(service.json_entries, null, 2), 'utf8');
 fs.writeFileSync("deWords.json", JSON.stringify(key_value_to_array(deWords), null, 2));
-fs.writeFileSync("engWords.json", JSON.stringify(key_value_to_array(engWords), null, 2));
+fs.writeFileSync("enWords.json", JSON.stringify(key_value_to_array(enWords), null, 2));
 // fs.writeFileSync("jmdict.json", JSON.stringify(service.json_entries), 'utf8');
 
 
 function key_value_to_array(entries) {
     return Object.keys(entries).map(text => {
-        if (entries[text] !== 0) return {text:text, commonness:entries[text]}
+        if (entries[text] !== 0) return {text:text, value:entries[text]}
         return {text:text}
     })
 }
