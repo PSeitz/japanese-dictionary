@@ -21,13 +21,13 @@ rows = rows.split("\n");
 
 var entries = {};
 
-for (var i = 0; i < 100000; i++) {
+for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
     var parts = row.split("\t");
     let text = parts[0];
     let freq  = parseInt(parts[1], 10);
     if (freq && !entries[text]) {
-        entries[text] = parseInt(Math.log(freq / 10000))
+        entries[text] = parseInt(Math.log(freq / 20000))
     }
 }
 
