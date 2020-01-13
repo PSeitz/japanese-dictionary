@@ -353,7 +353,7 @@ let json_entries: Entry[]= []
 
 let deWords: {[index: string]: number} = {
 }
-let engWords: {[index: string]: number} = {}
+let enWords: {[index: string]: number} = {}
 
 // interface Entry{
 //     pos:string[],
@@ -494,7 +494,7 @@ function buildDictionary(){
                 }else{
                     const meanings = entry.meanings[lang] = entry.meanings[lang] || []
                     if(meanings.indexOf(text) === -1) meanings.push(text);
-                    engWords[normalized_text] = eng_wordfreq[normalized_text] || 0
+                    enWords[normalized_text] = eng_wordfreq[normalized_text] || 0
                 }
             }
         }
@@ -554,13 +554,13 @@ buildDictionary();
 // Pretty Print
 fs.writeFileSync("jmdict.json", JSON.stringify(json_entries, null, 2), 'utf8');
 fs.writeFileSync("deWords.json", JSON.stringify(key_value_to_array(deWords), null, 2));
-fs.writeFileSync("engWords.json", JSON.stringify(key_value_to_array(engWords), null, 2));
+fs.writeFileSync("enWords.json", JSON.stringify(key_value_to_array(enWords), null, 2));
 // fs.writeFileSync("jmdict.json", JSON.stringify(json_entries), 'utf8');
 
 
 function key_value_to_array(entries: { [x: string]: number; }) {
     return Object.keys(entries).map(text => {
-        if (entries[text] !== 0) return {text:text, commonness:entries[text]}
+        if (entries[text] !== 0) return {text:text, value:entries[text]}
         return {text:text}
     })
 }
