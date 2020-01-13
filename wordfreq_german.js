@@ -22,7 +22,7 @@ for (var i = 0; i < 28000; i++) {
     let text = parts[0];
     let freq  = parseInt(parts[1], 10);
     if (freq && !entries[text]) {
-        entries[text] = 30 / freq
+        entries[text] = parseInt(30 / freq)
     }
 }
 

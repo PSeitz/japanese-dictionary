@@ -27,7 +27,7 @@ for (var i = 0; i < 100000; i++) {
     let text = parts[0];
     let freq  = parseInt(parts[1], 10);
     if (freq && !entries[text]) {
-        entries[text] = Math.log(freq / 10000)
+        entries[text] = parseInt(Math.log(freq / 10000))
     }
 }
 
